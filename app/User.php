@@ -2,13 +2,31 @@
 
 namespace App;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Contracts\Model as ModelContracts;
+use App\Models\Image;
+use App\Models\Role;
+use App\Models\UserRole;
+use App\Notifications\ResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements ModelContracts
 {
     use Notifiable;
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
 
     /**
      * The attributes that are mass assignable.
@@ -16,7 +34,15 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'id',
+        'first_name',
+        'last_name',
+        'username',
+        'gender',
+        'email',
+        'active',
+        'avatar',
+        'password'
     ];
 
     /**
@@ -24,9 +50,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * The attributes that should be cast to native types.
@@ -34,6 +58,169 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
+        'active' => 'boolean',
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['created_at', 'updated_at'];
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    public $table = 'users';
+
+    /**
+     * [OVERRIDE].
+     *
+     * @param string $token
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPassword($token));
+    }
+
+    public function sql()
+    {
+        $user_role = new UserRole();
+        $role = new Role();
+        $image = new Image();
+
+        return $this
+            ->leftJoin($user_role->table, $user_role->table . '.user_id', '=', $this->table . '.id')
+            ->leftJoin($role->table, $role->table . '.id', '=', $user_role->table . '.role_id')
+            ->leftJoin($image->table, $image->table . '.id', '=', $this->table . '.avatar')
+            ->select(
+                $this->table . '.id',
+                $role->table . '.role_name AS role',
+                $this->table . '.email',
+                $image->table . '.image_url as avatar',
+                $this->table . '.created_at AS join_date',
+                $this->table . '.active',
+                $this->table . '.active AS active_id'
+            )->orderBy(
+                $this->table . '.created_at', 'ASC'
+            );
+    }
+
+    public function image()
+    {
+        return $this->belongsTo(\App\Models\Image::class, 'avatar', 'id');
+    }
+
+    public function findForPassport($identifier)
+    {
+        return $this->orWhere('email', $identifier)->orWhere('name', $identifier)->first();
+    }
+
+    public function roleone()
+    {
+        return $this->hasOne(UserRole::class);
+    }
+
+    public function user_role()
+    {
+        return $this->hasOne(UserRole::class);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, UserRole::class, 'user_id', 'role_id');
+    }
+
+    /**
+     * Checking User has one or more role??
+     *
+     */
+    public function hasAnyRole()
+    {
+        $data = $this->roles->first();
+        if ($data === null) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isActivated()
+    {
+        if ($this->active == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check if user has role.
+     *
+     * <code>
+     * $roles = auth()->user()->hasRole(['Owner', 'Administrator']);
+     * dd($roles);
+     * </code>
+     *
+     * @param $roles
+     * @param string|null $slug
+     * @return bool
+     */
+    public function hasRole($roles, string $slug = null)
+    {
+        if (is_string($roles) && $roles === '*') {
+            return true;
+        }
+
+        if (is_string($roles) && false !== strpos($roles, '|')) {
+            $roles = $this->convertPipeToArray($roles);
+        }
+
+        if (is_string($roles)) {
+            return $this->roles->contains('slug', $roles);
+        }
+
+        if (is_array($roles)) {
+            foreach ($roles as $role) {
+                if ($this->hasRole($role, $slug)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return $roles->intersect($slug ? $this->roles->where('slug', $slug) : $this->roles)->isNotEmpty();
+    }
+
+    public function hasAnyRoles(...$roles)
+    {
+        return $this->hasRole($roles);
+    }
+
+    protected function convertPipeToArray(string $pipeString)
+    {
+        $pipeString = trim($pipeString);
+
+        if (strlen($pipeString) <= 2) {
+            return $pipeString;
+        }
+
+        $quoteCharacter = substr($pipeString, 0, 1);
+        $endCharacter = substr($quoteCharacter, -1, 1);
+
+        if ($quoteCharacter !== $endCharacter) {
+            return explode('|', $pipeString);
+        }
+
+        if (!in_array($quoteCharacter, ["'", '"'])) {
+            return explode('|', $pipeString);
+        }
+
+        return explode('|', trim($pipeString, $quoteCharacter));
+    }
 }
