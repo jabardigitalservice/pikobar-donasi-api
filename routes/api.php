@@ -22,4 +22,19 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api',
     Route::group(['as' => 'donate.', 'prefix' => 'donate'], function () {
         Route::get('/categories', 'DonateController@getCategory');
     });
+
+    Route::group(['as' => 'sembako.', 'prefix' => 'sembako'], function () {
+        Route::get('/', 'SembakoPackageController@index');
+        Route::get('/items', 'SembakoPackageController@itemIndex');
+
+        Route::post('/create', 'SembakoPackageController@store');
+        Route::post('/update/{id}', 'SembakoPackageController@update');
+        Route::post('/delete/{id}', 'SembakoPackageController@destroy');
+
+        Route::post('/create-item', 'SembakoPackageController@itemStore');
+        Route::post('/update-item/{id}', 'SembakoPackageController@itemUpdate');
+        Route::post('/delete-item/{id}', 'SembakoPackageController@destroy');
+    });
+
+
 });

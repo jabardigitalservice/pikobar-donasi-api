@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Constants;
 use App\Services\Mapper\Facades\Mapper;
 use Illuminate\Http\Request;
 use Unirest\Request as UniRequest;
 use Webpatser\Uuid\Uuid;
 
-class MasterController
+class MasterController extends Controller
 {
     /**
      * @param Request $request
