@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Http\JsonResponse;
 
 class Authenticate extends Middleware
 {
@@ -14,8 +15,11 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        if (! $request->expectsJson()) {
-            return route('login');
-        }
+        $errors = array();
+        $errors['meta']['code'] = 401;
+        $errors['meta']['message'] = trans('message.api.error');
+        $errors['meta']['errors'] = array('You must login');
+        $errors['data'] = [];
+        return new JsonResponse($errors, 401);
     }
 }

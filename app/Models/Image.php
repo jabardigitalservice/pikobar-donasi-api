@@ -58,6 +58,15 @@ class Image extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'image_url'
+    ];
+
+    /**
      * The primary key for the model.
      *
      * @var string
@@ -65,10 +74,12 @@ class Image extends Model
     protected $primaryKey = 'id';
 
     /**
-     * @param array $attributes
+     * Get the image's full url.
+     *
+     * @return string
      */
-    public function __construct(array $attributes = array())
+    public function getImageUrlAttribute()
     {
-        parent::__construct($attributes);
+        return \Storage::url($this->attributes['image_url']);
     }
 }

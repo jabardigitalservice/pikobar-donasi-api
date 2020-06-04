@@ -2,17 +2,21 @@
 
 namespace App;
 
-use App\Contracts\Model as ModelContracts;
 use App\Models\Image;
 use App\Models\Role;
 use App\Models\UserRole;
 use App\Notifications\ResetPassword;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable implements ModelContracts
+/**
+ * App\User
+ */
+class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasApiTokens, SoftDeletes;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -67,7 +71,14 @@ class User extends Authenticatable implements ModelContracts
      *
      * @var array
      */
-    protected $dates = ['created_at', 'updated_at'];
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
 
     /**
      * The table associated with the model.
@@ -86,37 +97,21 @@ class User extends Authenticatable implements ModelContracts
         $this->notify(new ResetPassword($token));
     }
 
-    public function sql()
+    public static function sql()
     {
-        $user_role = new UserRole();
-        $role = new Role();
-        $image = new Image();
-
-        return $this
-            ->leftJoin($user_role->table, $user_role->table . '.user_id', '=', $this->table . '.id')
-            ->leftJoin($role->table, $role->table . '.id', '=', $user_role->table . '.role_id')
-            ->leftJoin($image->table, $image->table . '.id', '=', $this->table . '.avatar')
-            ->select(
-                $this->table . '.id',
-                $role->table . '.role_name AS role',
-                $this->table . '.email',
-                $image->table . '.image_url as avatar',
-                $this->table . '.created_at AS join_date',
-                $this->table . '.active',
-                $this->table . '.active AS active_id'
-            )->orderBy(
-                $this->table . '.created_at', 'ASC'
-            );
+        return self::
+        select('users.*', 'users.id as id')
+            ->with('roles');
     }
 
     public function image()
     {
-        return $this->belongsTo(\App\Models\Image::class, 'avatar', 'id');
+        return $this->belongsTo(Image::class, 'avatar', 'id');
     }
 
     public function findForPassport($identifier)
     {
-        return $this->orWhere('email', $identifier)->orWhere('name', $identifier)->first();
+        return $this->orWhere('email', $identifier)->orWhere('username', $identifier)->first();
     }
 
     public function roleone()
