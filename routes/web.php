@@ -12,6 +12,7 @@
 */
 
 Route::get('/', function () {
+    dd((string)\Webpatser\Uuid\Uuid::generate(4));
     return view('welcome');
 });
 

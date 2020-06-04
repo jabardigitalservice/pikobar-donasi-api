@@ -24,8 +24,8 @@ class UserMapper extends BaseMapper implements MapperContract
             'first_name' => $item->first_name,
             'last_name' => $item->last_name,
             'avatar' => $item->avatar ? asset($item->image->getImageUrlAttribute()) : '',
-            'created_at' => $item->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $item->updated_at->format('Y-m-d H:i:s'),
+            'created_at' => $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : null,
+            'updated_at' => $item->updated_at ? $item->updated_at->format('Y-m-d H:i:s') : null,
             'roles' => $item->roles,
         ];
     }
