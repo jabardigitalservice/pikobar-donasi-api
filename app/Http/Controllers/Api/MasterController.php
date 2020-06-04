@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Constants;
 use App\Services\Mapper\Facades\Mapper;
 use Illuminate\Http\Request;
 use Unirest\Request as UniRequest;
@@ -9,8 +10,24 @@ use Webpatser\Uuid\Uuid;
 
 class MasterController
 {
-    private $url = 'https://dashboard-pikobar.digitalservice.id/api-pt-pos/master/material';
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function getUom(Request $request)
+    {
+        try {
+            $data = Constants::UOM;
+            return Mapper::array($data, $request->method());
+        } catch (\Exception $e) {
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public function getMaterial(Request $request)
     {
         $sort = $request->has('sort') ? $request->input('sort') : 'matg_id';
@@ -19,7 +36,7 @@ class MasterController
         $start = $request->has('start') ? $request->input('start') : 0;
         $request->input('start');
         $search_term = $request->input('search');
-        $headers = array('api-key' => config('covid19.api_key_donate'));
+        $headers = array('api-key' => config('covid19.api_key_logistic'));
         $api = config('covid19.api_url_logistic');
         $curlOptions = array(
             CURLOPT_SSL_VERIFYHOST => 0,
@@ -33,7 +50,6 @@ class MasterController
         $params = "?limit=$limit&skip=$start&search=$search_term&sort=$sort:$order";
         try {
             $response = UniRequest::get($api . $params, $headers, null);
-
             if ($response->code == 200) {
                 $dataRecords = $response->body['data'];
                 $num = 1;
@@ -54,7 +70,7 @@ class MasterController
                 }
                 return Mapper::array($items, $request->method());
             } else {
-                return Mapper::error($response, $request->method());
+                return Mapper::error($response->body['message'], $request->method());
             }
         } catch (\Exception $e) {
             return Mapper::error($e->getMessage(), $request->method());

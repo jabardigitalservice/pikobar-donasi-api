@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\InvalidCredentialsException;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Libraries\LoginProxy;
 use Illuminate\Foundation\Application;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Optimus\ApiConsumer\Facade\ApiConsumer;
 
-/**
- * https://laravel.com/docs/6.x/passport
- */
-class AppLoginController extends Controller
+class ApiLoginController extends Controller
 {
     private $loginProxy;
     private $apiConsumer;
@@ -28,6 +21,7 @@ class AppLoginController extends Controller
     /**
      * @param LoginRequest $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Exceptions\InvalidCredentialsException
      */
     public function login(LoginRequest $request)
     {
@@ -41,12 +35,18 @@ class AppLoginController extends Controller
         }
     }
 
-    public function refresh(Request $request)
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
     {
         return response()->json($this->loginProxy->attemptRefresh());
     }
 
-    public function logout(Request $request)
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
     {
         $this->loginProxy->logout();
         return response()->json(['data' => 'ok'], 200);

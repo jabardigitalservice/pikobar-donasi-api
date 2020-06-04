@@ -13,9 +13,6 @@ use Webpatser\Uuid\Uuid;
 use Illuminate\Http\Request;
 use App\Services\Mapper\Facades\Mapper;
 
-/**
- * https://laravel.com/docs/6.x/passport
- */
 class UserController extends Controller
 {
     private $imageModel;

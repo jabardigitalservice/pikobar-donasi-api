@@ -87,7 +87,6 @@ class LoginProxy
 
         if (!$response->isSuccessful()) {
             //return abort(401);
-			//return $response;
             throw new InvalidCredentialsException();
         }
 
@@ -105,7 +104,9 @@ class LoginProxy
         );
 
         return [
+            'token_type' => $data->token_type,
             'access_token' => $data->access_token,
+            'refresh_token' => $data->refresh_token,
             'expires_in' => $data->expires_in
         ];
     }
