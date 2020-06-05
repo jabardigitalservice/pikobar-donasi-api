@@ -33,8 +33,7 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api',
 
         Route::post('/create-item', 'SembakoPackageController@itemStore');
         Route::post('/update-item/{id}', 'SembakoPackageController@itemUpdate');
-        Route::post('/delete-item/{id}', 'SembakoPackageController@destroy');
+        Route::post('/delete-item/{id}', 'SembakoPackageController@destroyItem');
     });
-
 
 });

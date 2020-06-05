@@ -42,7 +42,6 @@ class SembakoPackageItem extends Model
      */
     protected $fillable = [
         'id',
-        'sembako_id',
         'item_name',
         'item_sku',
         'quantity',
@@ -50,4 +49,9 @@ class SembakoPackageItem extends Model
         'last_modified_by',
         'status'
     ];
+
+    public function packages()
+    {
+        return $this->belongsToMany(SembakoPackageItem::class, 'sembako_many', 'item_id', 'package_id');
+    }
 }

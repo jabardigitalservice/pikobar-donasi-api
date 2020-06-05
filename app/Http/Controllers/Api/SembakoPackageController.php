@@ -157,6 +157,20 @@ class SembakoPackageController extends Controller
         }
     }
 
+    public function destroyItem($id, Request $request)
+    {
+        \DB::beginTransaction();
+        try {
+            $item = SembakoPackageItem::findOrFail($id);
+            $item->delete();
+            \DB::commit();
+            return Mapper::success($request->method());
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
     public function destroy($id, Request $request)
     {
         \DB::beginTransaction();

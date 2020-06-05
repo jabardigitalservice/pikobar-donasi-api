@@ -18,8 +18,8 @@ class SembakoItemPackageMap extends BaseMapper implements MapperContract
     {
         return [
             'id' => $item->id,
-            'item_name' => $item->sku,
-            'item_sku' => $item->package_name,
+            'item_name' => $item->item_name,
+            'item_sku' => $item->item_sku,
             'quantity' => $item->quantity,
             'package_description' => $item->package_description,
             'status' => $item->status,
