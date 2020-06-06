@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SembakoPackage extends Model
 {
+    use SoftDeletes;
+
     public $table = 'sembako_packages';
 
     /**
@@ -33,7 +36,7 @@ class SembakoPackage extends Model
      *
      * @var array
      */
-    protected $dates = ['created_at', 'updated_at'];
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
@@ -52,18 +55,23 @@ class SembakoPackage extends Model
         'sku',
         'package_name',
         'package_description',
+        'last_modified_by',
+        'deleted_by',
         'status'
     ];
 
     public static function sql()
     {
-        return self::select('*')->with('items');
+        return self::select(
+            'sembako_packages.id',
+            'sembako_packages.sku',
+            'sembako_packages.package_name',
+            'sembako_packages.package_description',
+            'sembako_packages.status',
+            'sembako_packages.created_at',
+            'sembako_packages.updated_at'
+        )->with('items');
     }
-
-    /*public function items()
-    {
-        return $this->hasMany('App\Models\SembakoPackageItem', 'sembako_id', 'id');
-    }*/
 
     public function items()
     {

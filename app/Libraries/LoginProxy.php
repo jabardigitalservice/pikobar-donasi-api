@@ -2,12 +2,17 @@
 
 namespace App\Libraries;
 
-use Illuminate\Foundation\Application;
 use App\Exceptions\InvalidCredentialsException;
 use App\Repositories\UserRepository;
+use Illuminate\Foundation\Application;
+use Laravel\Passport\Http\Controllers\HandlesOAuthErrors;
+use Unirest\Request as UniRequest;
+use Unirest\Request\Body as UniBody;
 
 class LoginProxy
 {
+    use HandlesOAuthErrors;
+
     const REFRESH_TOKEN = 'refreshToken';
 
     private $apiConsumer;
@@ -51,63 +56,52 @@ class LoginProxy
                 'password' => $password
             ]);
         }
-        return abort(401);
+        //return abort(401);
     }
 
     /**
      * Attempt to refresh the access token used a refresh token that
      * has been saved in a cookie
      */
-    public function attemptRefresh()
+    public function attemptRefresh($token)
     {
-        $refreshToken = $this->request->cookie(self::REFRESH_TOKEN);
-
         return $this->proxy('refresh_token', [
-            'refresh_token' => $refreshToken
+            'refresh_token' => $token
         ]);
     }
 
-    /**
-     * @param $grantType
-     * @param array $data
-     * @return array
-     * @throws InvalidCredentialsException
-     */
     public function proxy($grantType, array $data = [])
     {
         $data = array_merge($data, [
             'client_id' => env('PASSWORD_CLIENT_ID', '2'),
-            'client_secret' => env('PASSWORD_CLIENT_SECRET', '6uK3T8N8afK9xkxOE5zPJVxkwKEkUpi9lidC6pIa'),
+            'client_secret' => env('PASSWORD_CLIENT_SECRET', '6uK3T8N8af'),
             'grant_type' => $grantType
         ]);
-
-        $url = env('OAUTH_CLIENT_URL');
-
-        $response = $this->apiConsumer->post($url, $data);
-
-        if (!$response->isSuccessful()) {
-            //return abort(401);
-            throw new InvalidCredentialsException();
-        }
-
-        $data = json_decode($response->getContent());
-
-        // Create a refresh token cookie
-        $this->cookie->queue(
-            self::REFRESH_TOKEN,
-            $data->refresh_token,
-            864000, // 10 days
-            null,
-            null,
-            false,
-            true // HttpOnly
+        $curlOptions = array(
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSLVERSION => 6,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => 60
         );
-
+        UniRequest::curlOpts($curlOptions);
+        UniRequest::jsonOpts(true, 512, JSON_UNESCAPED_SLASHES);
+        UniRequest::verifyPeer(false);
+        $body = UniBody::Form($data);
+        $headers = array('Accept' => 'application/json');
+        $uri = config('app.url') . '/' . config('covid19.oauth_client_url');
+        $response = UniRequest::post($uri, $headers, $body);
+        if ($response->code != 200) {
+            return [
+                'header' => 401,
+                'errors' => $response->body
+            ];
+        }
         return [
-            'token_type' => $data->token_type,
-            'access_token' => $data->access_token,
-            'refresh_token' => $data->refresh_token,
-            'expires_in' => $data->expires_in
+            'header' => 200,
+            'token_type' => $response->body['token_type'],
+            'access_token' => $response->body['access_token'],
+            'refresh_token' => $response->body['refresh_token'],
+            'expires_in' => $response->body['expires_in']
         ];
     }
 
@@ -124,6 +118,5 @@ class LoginProxy
                 'revoked' => true
             ]);
         $accessToken->revoke();
-        $this->cookie->queue($this->cookie->forget(self::REFRESH_TOKEN));
     }
 }

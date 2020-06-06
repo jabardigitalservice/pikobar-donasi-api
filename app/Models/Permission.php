@@ -7,10 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class Permission.
  *
- * @author Odenktools Technology
- * @license MIT
- * @copyright (c) 2020, Odenktools Technology.
- *
  * @package App\Models
  */
 class Permission extends Model

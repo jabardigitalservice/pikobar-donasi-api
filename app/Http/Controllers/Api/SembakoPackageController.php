@@ -9,10 +9,12 @@ use App\Http\Requests\Sembako\UpdateItemRequest;
 use App\Http\Requests\Sembako\UpdateRequest;
 use App\Mappers\SembakoItemPackageMap;
 use App\Mappers\SembakoPackageMap;
+use App\Models\Constants;
 use App\Models\SembakoPackage;
 use App\Models\SembakoPackageItem;
 use App\Services\Mapper\Facades\Mapper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Webpatser\Uuid\Uuid;
 
 class SembakoPackageController extends Controller
@@ -36,6 +38,7 @@ class SembakoPackageController extends Controller
             $countAll = SembakoPackage::count();
             return Mapper::list(new SembakoPackageMap(), $paged, $countAll, $request->method());
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
             return Mapper::error($e->getMessage(), $request->method());
         }
     }
@@ -52,13 +55,14 @@ class SembakoPackageController extends Controller
                 $conditions .= " AND LOWER(sembako_package_items.item_name) LIKE '%$search_term%'";
                 $conditions .= " OR LOWER(sembako_package_items.item_sku) LIKE '%$search_term%'";
             }
-            $paged = SembakoPackageItem::select('*')
+            $paged = SembakoPackageItem::sql()
                 ->whereRaw($conditions)
                 ->orderBy($sort, $order)
                 ->paginate($limit);
             $countAll = SembakoPackageItem::count();
             return Mapper::list(new SembakoItemPackageMap(), $paged, $countAll, $request->method());
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
             return Mapper::error($e->getMessage(), $request->method());
         }
     }
@@ -92,6 +96,35 @@ class SembakoPackageController extends Controller
             \DB::commit();
             return Mapper::single(new SembakoPackageMap(), $sembako, $request->method());
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            \DB::rollBack();
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
+    public function itemStore(CreateItemRequest $request)
+    {
+        \DB::beginTransaction();
+        try {
+            $uomId = $this->searchUomId($request->uom, Constants::UOM);
+            if (!$uomId) {
+                return Mapper::error("UOM tidak tersedia.", $request->method());
+            }
+            $sembako = SembakoPackageItem::create([
+                'id' => Uuid::generate(4)->string,
+                'item_name' => $request->item_name,
+                'item_sku' => $request->item_sku,
+                'quantity' => $request->quantity,
+                'uom' => $uomId['id'],
+                'uom_name' => $uomId['name'],
+                'package_description' => $request->package_description,
+                'status' => !$request->status ? false : true,
+                'last_modified_by' => auth('api')->user()->id
+            ]);
+            \DB::commit();
+            return Mapper::single(new SembakoPackageMap(), $sembako, $request->method());
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
             \DB::rollBack();
             return Mapper::error($e->getMessage(), $request->method());
         }
@@ -102,37 +135,24 @@ class SembakoPackageController extends Controller
         \DB::beginTransaction();
         try {
             $sembako = SembakoPackageItem::findOrFail($id);
+            $uomId = $this->searchUomId($request->uom, Constants::UOM);
+            if (!$uomId) {
+                return Mapper::error("UOM tidak tersedia.", $request->method());
+            }
             $sembako->item_name = $request->item_name;
-            $sembako->item_sku = $request->item_sku;
+            //SKU seharusnya memang tidak boleh diupdate, karena akan mengacaukan data
+            //$sembako->item_sku = $request->item_sku;
             $sembako->quantity = $request->quantity;
             $sembako->package_description = $request->package_description;
             $sembako->status = !$request->status ? false : true;
+            $sembako->uom = $uomId['id'];
+            $sembako->uom_name = $uomId['name'];
             $sembako->last_modified_by = auth('api')->user()->id;
             $sembako->update();
             \DB::commit();
-            return Mapper::single(new SembakoPackageMap(), $sembako, $request->method());
+            return Mapper::single(new SembakoItemPackageMap(), $sembako, $request->method());
         } catch (\Exception $e) {
-            \DB::rollBack();
-            return Mapper::error($e->getMessage(), $request->method());
-        }
-    }
-
-    public function itemStore(CreateItemRequest $request)
-    {
-        \DB::beginTransaction();
-        try {
-            $sembako = SembakoPackageItem::create([
-                'id' => Uuid::generate(4)->string,
-                'item_name' => $request->item_name,
-                'item_sku' => $request->item_sku,
-                'quantity' => $request->quantity,
-                'package_description' => $request->package_description,
-                'status' => !$request->status ? false : true,
-                'last_modified_by' => auth('api')->user()->id
-            ]);
-            \DB::commit();
-            return Mapper::single(new SembakoPackageMap(), $sembako, $request->method());
-        } catch (\Exception $e) {
+            Log::error($e->getMessage());
             \DB::rollBack();
             return Mapper::error($e->getMessage(), $request->method());
         }
@@ -143,7 +163,8 @@ class SembakoPackageController extends Controller
         \DB::beginTransaction();
         try {
             $sembako = SembakoPackage::findOrFail($id);
-            $sembako->sku = $request->sku;
+            //SKU seharusnya memang tidak boleh diupdate, karena akan mengacaukan data
+            //$sembako->sku = $request->sku;
             $sembako->package_name = $request->package_name;
             $sembako->package_description = $request->package_description;
             $sembako->status = !$request->status ? false : true;
@@ -152,6 +173,7 @@ class SembakoPackageController extends Controller
             \DB::commit();
             return Mapper::single(new SembakoPackageMap(), $sembako, $request->method());
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
             \DB::rollBack();
             return Mapper::error($e->getMessage(), $request->method());
         }
@@ -162,10 +184,13 @@ class SembakoPackageController extends Controller
         \DB::beginTransaction();
         try {
             $item = SembakoPackageItem::findOrFail($id);
+            $item->deleted_by = auth('api')->user()->id;
+            $item->update();
             $item->delete();
             \DB::commit();
             return Mapper::success($request->method());
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
             \DB::rollBack();
             return Mapper::error($e->getMessage(), $request->method());
         }
@@ -176,13 +201,26 @@ class SembakoPackageController extends Controller
         \DB::beginTransaction();
         try {
             $item = SembakoPackage::findOrFail($id);
+            $item->deleted_by = auth('api')->user()->id;
+            $item->update();
             $item->items()->detach();
             $item->delete();
             \DB::commit();
             return Mapper::success($request->method());
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
             \DB::rollBack();
-            return Mapper::error($e->getMessage(), $request->method());
+            return Mapper::error("item tidak ada", $request->method());
         }
+    }
+
+    private function searchUomId($id, $array)
+    {
+        foreach ($array as $key => $val) {
+            if ($val['id'] === $id) {
+                return $val;
+            }
+        }
+        return null;
     }
 }

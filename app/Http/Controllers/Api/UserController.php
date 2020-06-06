@@ -7,11 +7,11 @@ use App\Http\Requests\User\CreateRequest;
 use App\Libraries\ImageLibrary;
 use App\Mappers\UserMapper;
 use App\Models\Role;
+use App\Services\Mapper\Facades\Mapper;
 use App\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Webpatser\Uuid\Uuid;
-use Illuminate\Http\Request;
-use App\Services\Mapper\Facades\Mapper;
 
 class UserController extends Controller
 {
@@ -22,12 +22,6 @@ class UserController extends Controller
         $this->imageModel = new \App\Models\Image();
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @param $companyCode
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         try {

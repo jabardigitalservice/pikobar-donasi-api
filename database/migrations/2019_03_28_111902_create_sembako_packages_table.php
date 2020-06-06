@@ -25,12 +25,12 @@ class CreateSembakoPackagesTable extends Migration
             $table->string('last_modified_by', 255)->nullable();
             $table->string('deleted_by', 255)->nullable();
             $table->primary(['id']);
+            $table->timestamps();
+            $table->softDeletes();
 
             $table->index('sku');
             $table->index('package_name');
             $table->index('status');
-
-            $table->timestamps();
         });
 
         Schema::create('sembako_package_items', function (Blueprint $table) {
@@ -38,12 +38,15 @@ class CreateSembakoPackagesTable extends Migration
             $table->string('item_name');
             $table->string('item_sku');
             $table->integer('quantity')->default(0);
+            $table->string('uom', 255)->nullable();
+            $table->string('uom_name', 255)->nullable();
             $table->text('package_description')->nullable();
             $table->tinyInteger('status')->default(1)->comment('1=aktif 0 = nonaktif');
             $table->string('last_modified_by', 255)->nullable();
-            $table->timestamps();
+            $table->string('deleted_by', 255)->nullable();
             $table->primary(['id']);
-
+            $table->timestamps();
+            $table->softDeletes();
             $table->index('item_sku');
             $table->index('status');
         });
@@ -70,6 +73,7 @@ class CreateSembakoPackagesTable extends Migration
      */
     public function down()
     {
+        Schema::drop('sembako_many');
         Schema::drop('sembako_package_items');
         Schema::drop('sembako_packages');
     }

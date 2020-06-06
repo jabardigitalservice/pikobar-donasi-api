@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Libraries\LoginProxy;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ApiLoginController extends Controller
@@ -19,31 +20,38 @@ class ApiLoginController extends Controller
     }
 
     /**
+     * Oauth2 Login.
+     *
      * @param LoginRequest $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \App\Exceptions\InvalidCredentialsException
      */
     public function login(LoginRequest $request)
     {
-        $email = $request->get('email');
-        $password = $request->get('password');
-
+        $email = $request->input('email');
+        $password = $request->input('password');
+        $data = $this->loginProxy->attemptLogin($email, $password);
         try {
-            return response()->json($this->loginProxy->attemptLogin($email, $password));
+            return response()->json($data, $data['header']);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
     }
 
     /**
+     * Oauth2 Refresh Token.
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refresh()
+    public function refresh(Request $request)
     {
-        return response()->json($this->loginProxy->attemptRefresh());
+        $refreshToken = $request->input('refresh_token');
+        return response()->json($this->loginProxy->attemptRefresh($refreshToken));
     }
 
     /**
+     * Oauth2 Logout.
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function logout()

@@ -9,10 +9,6 @@ use Illuminate\Http\Request;
 
 class DonateController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @return \Illuminate\Http\Response
-     */
     public function getCategory(Request $request)
     {
         try {

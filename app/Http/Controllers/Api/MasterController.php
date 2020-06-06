@@ -11,10 +11,6 @@ use Webpatser\Uuid\Uuid;
 
 class MasterController extends Controller
 {
-    /**
-     * @param Request $request
-     * @return mixed
-     */
     public function getUom(Request $request)
     {
         try {
@@ -25,10 +21,6 @@ class MasterController extends Controller
         }
     }
 
-    /**
-     * @param Request $request
-     * @return mixed
-     */
     public function getMaterial(Request $request)
     {
         $sort = $request->has('sort') ? $request->input('sort') : 'matg_id';
@@ -47,10 +39,10 @@ class MasterController extends Controller
         );
         UniRequest::curlOpts($curlOptions);
         UniRequest::jsonOpts(true, 512, JSON_UNESCAPED_SLASHES);
-        UniRequest::verifyPeer(false); // Disables SSL cert validation
+        UniRequest::verifyPeer(false);
         $params = "?limit=$limit&skip=$start&search=$search_term&sort=$sort:$order";
         try {
-            $response = UniRequest::get($api . $params, $headers, null);
+            $response = \Unirest\Request::get($api . $params, $headers, null);
             if ($response->code == 200) {
                 $dataRecords = $response->body['data'];
                 $num = 1;

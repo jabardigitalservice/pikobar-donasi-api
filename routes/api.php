@@ -1,7 +1,8 @@
 <?php
 
+// Login, Logout, Refresh Token
 Route::post('/login', ['as' => 'api.login', 'uses' => 'ApiLoginController@login']);
-Route::post('/login/refresh', 'ApiLoginController@refresh');
+Route::post('/refresh-token', 'ApiLoginController@refresh');
 Route::delete('/logout', 'ApiLoginController@logout')->middleware('auth:api');
 
 Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api', 'prefix' => 'v1'], function () {

@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\User;
 
-use App\Libraries\ResponseLibrary;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -47,7 +46,6 @@ class CreateRequest extends FormRequest
      */
     protected function failedValidation(Validator $validator)
     {
-        $responseLib = new ResponseLibrary();
-        throw new HttpResponseException( $responseLib->validationFailJsonResponse($validator->errors()->all()), 422);
+        throw new HttpResponseException(Mapper::validation($validator, $this->method()));
     }
 }

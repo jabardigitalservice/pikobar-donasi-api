@@ -7,10 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Image Model untuk store image.
  *
- * @author Odenktools Technology
- * @license MIT
- * @copyright (c) 2020, Odenktools Technology.
- *
  * @package App\Models
  */
 class Image extends Model

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Sembako;
 
-use App\Libraries\ResponseLibrary;
+use App\Services\Mapper\Facades\Mapper;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -30,7 +30,8 @@ class CreateItemRequest extends FormRequest
             'item_name' => 'required|min:3|max:150',
             'item_sku' => 'required|min:5|max:50|unique:sembako_package_items,item_sku,NULL,id',
             'quantity' => 'required|digits_between:1,9999999999',
-            'package_description' => 'required|min:6',
+            'uom' => 'required',
+            'package_description' => 'required',
             'status' => 'boolean'
         ];
     }
@@ -45,7 +46,6 @@ class CreateItemRequest extends FormRequest
      */
     protected function failedValidation(Validator $validator)
     {
-        $responseLib = new ResponseLibrary();
-        throw new HttpResponseException($responseLib->validationFailJsonResponse($validator->errors()->all()), 422);
+        throw new HttpResponseException(Mapper::validation($validator, $this->method()));
     }
 }

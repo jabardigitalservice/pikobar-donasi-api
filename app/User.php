@@ -101,9 +101,18 @@ class User extends Authenticatable
 
     public static function sql()
     {
-        return self::
-        select('users.*', 'users.id as id')
-            ->with('roles');
+        return self::select('users.id as id',
+            'users.first_name',
+            'users.last_name',
+            'users.username',
+            'users.gender',
+            'users.email',
+            'users.active',
+            'users.avatar',
+            'users.password',
+            'users.created_at',
+            'users.updated_at'
+        )->with('roles');
     }
 
     public function image()

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Contracts\Model as ModelContracts;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Role extends Model implements ModelContracts
+class Role extends Model
 {
     public $table = 'roles';
 
@@ -55,30 +54,16 @@ class Role extends Model implements ModelContracts
         'is_default'
     ];
 
-    public function sql()
+    public static function sql()
     {
-        return $this
-            ->select(
-                $this->table . '.id',
-                $this->table . '.slug',
-                $this->table . '.role_name',
-                $this->table . '.description',
-                $this->table . '.is_active',
-                $this->table . '.is_default'
-            );
-    }
-
-    public function role_menu()
-    {
-        return $this->hasMany(MenuRole::class);
-    }
-
-    public function menus()
-    {
-        return $this->belongsToMany(Menu::class,
-            'menu_roles',
-            'role_id',
-            'menu_id');
+        return self::select(
+            'roles.id',
+            'roles.slug',
+            'roles.role_name',
+            'roles.description',
+            'roles.is_active',
+            'roles.is_default'
+        );
     }
 
     public function permissions()

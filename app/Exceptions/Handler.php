@@ -21,6 +21,7 @@ class Handler extends ExceptionHandler
         \Illuminate\Database\Eloquent\ModelNotFoundException::class,
         \Illuminate\Session\TokenMismatchException::class,
         \Illuminate\Validation\ValidationException::class,
+        \League\OAuth2\Server\Exception\OAuthServerException::class,
     ];
 
     /**
@@ -75,23 +76,31 @@ class Handler extends ExceptionHandler
         } else if ($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
             $response['meta']['code'] = Response::HTTP_NOT_FOUND;
             return response()->json($response, Response::HTTP_NOT_FOUND);
-        } else if ( $exception instanceof \Illuminate\Auth\Access\AuthorizationException) {
+        } else if ($exception instanceof \Illuminate\Auth\Access\AuthorizationException) {
             $response['meta']['code'] = Response::HTTP_UNAUTHORIZED;
             return response()->json($response, Response::HTTP_UNAUTHORIZED);
-        } else if ( $exception instanceof \Illuminate\Auth\AuthenticationException) {
+        } else if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
             $response['meta']['code'] = Response::HTTP_UNAUTHORIZED;
             return response()->json($response, Response::HTTP_UNAUTHORIZED);
-        } else if ( $exception instanceof \Illuminate\Session\TokenMismatchException) {
+        } else if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
             $response['meta']['code'] = Response::HTTP_UNAUTHORIZED;
             return response()->json($response, Response::HTTP_UNAUTHORIZED);
-        } else if ( $exception instanceof \Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException) {
+        } else if ($exception instanceof \Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException) {
             $response['meta']['code'] = Response::HTTP_UNAUTHORIZED;
             return response()->json($response, Response::HTTP_UNAUTHORIZED);
-        } else if ( $exception instanceof \Laravel\Passport\Exceptions\OAuthServerException) {
+        } else if ($exception instanceof \Laravel\Passport\Exceptions\OAuthServerException) {
+            $response['meta']['code'] = Response::HTTP_UNAUTHORIZED;
+            return response()->json($response, Response::HTTP_UNAUTHORIZED);
+        } else if ($exception instanceof \League\OAuth2\Server\Exception\OAuthServerException) {
+            $response['meta']['code'] = Response::HTTP_UNAUTHORIZED;
+            return response()->json($response, Response::HTTP_UNAUTHORIZED);
+        } else if ($exception instanceof \League\OAuth2\Server\Exception\OAuthServerException) {
             $response['meta']['code'] = Response::HTTP_UNAUTHORIZED;
             return response()->json($response, Response::HTTP_UNAUTHORIZED);
         }
-        if ( !($exception instanceof \Illuminate\Validation\ValidationException)) {
+
+
+        if (!($exception instanceof \Illuminate\Validation\ValidationException)) {
             $response['meta']['code'] = 400;
             return response()->json($response, 400);
         }

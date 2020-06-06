@@ -45,8 +45,7 @@ class Constants
 
     public const INVESTOR_CATEGORIES = [
         array('id' => '10000000-0001-44bd-a26c-000000000001', 'slug' => 'personal', 'name' => 'Personal'),
-        array('id' => '10000000-0002-44bd-a26c-000000000002', 'slug' => 'perusahaan', 'name' => 'Perusahaan'),
-        array('id' => '10000000-0003-44bd-a26c-000000000003', 'slug' => 'organisasi', 'name' => 'Organisasi'),
+        array('id' => '10000000-0002-44bd-a26c-000000000002', 'slug' => 'perusahaan', 'name' => 'Perusahaan/Organisasi'),
     ];
 
     public const INVESTOR_RATING = [
