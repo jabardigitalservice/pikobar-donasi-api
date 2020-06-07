@@ -21,6 +21,26 @@ class MasterController extends Controller
         }
     }
 
+    public function getInvestorCategory(Request $request)
+    {
+        try {
+            $data = Constants::INVESTOR_CATEGORIES;
+            return Mapper::array($data, $request->method());
+        } catch (\Exception $e) {
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
+    public function getInvestorStatus(Request $request)
+    {
+        try {
+            $data = Constants::INVESTOR_STATUS;
+            return Mapper::array($data, $request->method());
+        } catch (\Exception $e) {
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
     public function getMaterial(Request $request)
     {
         $sort = $request->has('sort') ? $request->input('sort') : 'matg_id';

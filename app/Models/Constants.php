@@ -37,10 +37,16 @@ class Constants
         array('id' => '00000001-0001-43ad-a18c-000000000030', 'slug' => 'sachet', 'name' => 'Sachet'),
     ];
 
-    public const DONATE_CATEGORIES = [
+    public const DONATION_CATEGORIES = [
         array('id' => '00000000-0001-43ad-a18c-000000000001', 'slug' => 'medis', 'name' => 'Medis'),
         array('id' => '00000000-0002-43ad-a18c-000000000002', 'slug' => 'non-medis', 'name' => 'Non Medis'),
         array('id' => '00000000-0003-43ad-a18c-000000000003', 'slug' => 'logistik', 'name' => 'Logistik'),
+        array('id' => '00000000-0003-43ad-a18c-000000000004', 'slug' => 'tunai', 'name' => 'Tunai'),
+    ];
+
+    public const INVESTOR_STATUS = [
+        array('id' => '11000000-0001-13ab-b18d-000000000001', 'slug' => 'pending', 'name' => 'Pending'),
+        array('id' => '11000000-0002-13ab-b18d-000000000002', 'slug' => 'verified', 'name' => 'Verified'),
     ];
 
     public const INVESTOR_CATEGORIES = [
