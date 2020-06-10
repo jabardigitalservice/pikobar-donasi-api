@@ -62,6 +62,7 @@ class CreateInvestorTable extends Migration
 
             //jika tunai
             $table->string('bank_id', 255)->nullable()->comment('uuid bank');
+            $table->string('bank_name', 150)->nullable()->comment('Nama Bank');
             $table->string('bank_account', 80)->nullable()->comment('Rekening atas nama');
             $table->string('bank_number', 30)->nullable()->comment('Nomor Rekening');
             $table->double('amount')->nullable()->comment('nilai mata uang yang didonasikan, nomor harus unik seperti eccomerce');

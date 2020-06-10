@@ -58,7 +58,7 @@ class Investor extends Model
         'donate_status',
         'donate_status_name',
         'invoice_number',
-        'attachment_id',
+        'files',
         'show_name',
         'donate_date',
         'last_modified_by',

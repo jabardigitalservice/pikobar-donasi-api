@@ -31,10 +31,20 @@ class MasterController extends Controller
         }
     }
 
-    public function getInvestorStatus(Request $request)
+    public function getDonationStatus(Request $request)
     {
         try {
             $data = Constants::INVESTOR_STATUS;
+            return Mapper::array($data, $request->method());
+        } catch (\Exception $e) {
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
+    public function getDonationType(Request $request)
+    {
+        try {
+            $data = Constants::DONATION_CATEGORIES;
             return Mapper::array($data, $request->method());
         } catch (\Exception $e) {
             return Mapper::error($e->getMessage(), $request->method());

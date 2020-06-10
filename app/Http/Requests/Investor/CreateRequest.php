@@ -44,18 +44,18 @@ class CreateRequest extends FormRequest
         if ($donateCategoryId['slug'] === 'logistik') {
             $rules['package_id'] = 'required';
             $rules['quantity'] = 'required|min:1|max:9999999999';
-            //$rules['files'] = 'required|mimes:docx,doc,pdf';
+            $rules['files'] = 'required|mimes:docx,doc,pdf,jpeg,jpg,png';
         } else if ($donateCategoryId['slug'] === 'tunai') {
             $rules['bank_id'] = 'required';
             $rules['bank_account'] = 'required';
             $rules['bank_number'] = 'required';
             $rules['amount'] = 'required|digits_between:1,9999999999';
-            //$rules['files'] = 'required|mimes:jpeg,jpg,png';
+            $rules['files'] = 'required|mimes:jpeg,jpg,png';
         } else {
             $rules['items'] = 'array';
             $rules['items.*.quantity'] = 'required|min:1|max:9999999999';
             $rules['items.*.oum'] = 'required';
-            //$rules['files'] = 'required|mimes:docx,doc,pdf';
+            $rules['files'] = 'required|mimes:docx,doc,pdf';
         }
 
         return $rules;

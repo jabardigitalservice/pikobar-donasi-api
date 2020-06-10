@@ -55,6 +55,7 @@ class InvestorItem extends Model
         'item_package_name',
         'quantity',
         'bank_id',
+        'bank_name',
         'bank_account',
         'bank_number',
         'amount',

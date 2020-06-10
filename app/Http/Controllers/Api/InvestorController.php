@@ -5,13 +5,18 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\Investor\CreateRequest;
 use App\Libraries\ConstantParser;
+use App\Libraries\FilesLibrary;
+use App\Libraries\ImageLibrary;
 use App\Mappers\Investor\SembakoDonateMap;
+use App\Models\Bank;
 use App\Models\Constants;
 use App\Models\Investor;
 use App\Models\InvestorItem;
 use App\Models\SembakoPackage;
 use App\Services\Mapper\Facades\Mapper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Webpatser\Uuid\Uuid;
 
 class InvestorController extends ApiController
@@ -32,44 +37,83 @@ class InvestorController extends ApiController
         $phone = $request->phone;
         $email = $request->email;
 
-        $data = Investor::create([
-            'id' => Uuid::generate(4)->string,
-            'investor_name' => $investor_name,
-            'category_id' => $investorCategoryId['id'],
-            'category_slug' => $investorCategoryId['slug'],
-            'category_name' => $investorCategoryId['name'],
-            'phone' => $phone,
-            'email' => $email,
-            'address' => $request->address,
-            'donate_id' => $donateCategoryId['id'],
-            'donate_category' => $donateCategoryId['slug'],
-            'donate_category_name' => $donateCategoryId['name'],
-
-            'donate_status' => $donateStatus['slug'],
-            'donate_status_name' => $donateStatus['name'],
-
-            'invoice_number' => (string)now(),
-            'attachment_id' => null,
-
-            'show_name' => !$request->show_name ? false : true,
-            'donate_date' => date('Y-m-d'),
-        ]);
-
-        $dataRequest = null;
-        if ($donateCategoryId['slug'] === 'logistik') {
-            try {
-                $dataRequest = $this->storeSembako($request, $data->id);
-            } catch (\Exception $e) {
-                return Mapper::error($e->getMessage(), $request->method());
+        DB::beginTransaction();
+        try {
+            $data = new Investor();
+            $data->id = Uuid::generate(4)->string;
+            $data->investor_name = $investor_name;
+            $data->category_id = $investorCategoryId['id'];
+            $data->category_slug = $investorCategoryId['slug'];
+            $data->category_name = $investorCategoryId['name'];
+            $data->phone = $phone;
+            $data->email = $email;
+            $data->address = $request->address;
+            $data->donate_id = $donateCategoryId['id'];
+            $data->donate_category = $donateCategoryId['slug'];
+            $data->donate_category_name = $donateCategoryId['name'];
+            $data->invoice_number = (string)now();
+            $data->show_name = !$request->show_name ? false : true;
+            $data->donate_date = date('Y-m-d');
+            $dataRequest = null;
+            if ($donateCategoryId['slug'] === 'logistik') {
+                try {
+                    foreach ($request->file() as $key => $file) {
+                        if ($request->hasFile($key)) {
+                            if ($request->file($key)->isValid()) {
+                                $fileLib = new FilesLibrary();
+                                $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
+                                $dataId = $fileLib->saveDocument($request->file($key), $name);
+                                $tempExtra = [];
+                                $tempExtra['id'] = Uuid::generate(4)->string;
+                                $tempExtra['created_at'] = date('Y-m-d');
+                                $tempExtra['updated_at'] = date('Y-m-d');
+                                $imageData[$dataId] = $tempExtra;
+                            }
+                        } else {
+                            $key_id = !empty($request->$key . '_old') ? $request->$key . '_old' : null;
+                            $imageData[$key_id] = array();
+                        }
+                    }
+                    $data->save();
+                    $dataRequest = $this->storeSembako($request, $data->id);
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    return Mapper::error($e->getMessage(), $request->method());
+                }
+            } else if ($donateCategoryId['slug'] === 'tunai') {
+                try {
+                    foreach ($request->file() as $key => $file) {
+                        if ($request->hasFile($key)) {
+                            if ($request->file($key)->isValid()) {
+                                $fileLib = new ImageLibrary();
+                                $savePath = 'investor/transfer';
+                                $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
+                                $dataId = $fileLib->saveTransferSlip($request->file($key), $savePath, $name);
+                                $tempExtra = [];
+                                $tempExtra['id'] = Uuid::generate(4)->string;
+                                $tempExtra['created_at'] = date('Y-m-d');
+                                $tempExtra['updated_at'] = date('Y-m-d');
+                                $imageData[$dataId] = $tempExtra;
+                            }
+                        } else {
+                            $key_id = !empty($request->$key . '_old') ? $request->$key . '_old' : null;
+                            $imageData[$key_id] = array();
+                        }
+                    }
+                    $data->save();
+                    $dataRequest = $this->storeTunai($request, $data->id);
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    return Mapper::error($e->getMessage(), $request->method());
+                }
             }
-        } else if ($donateCategoryId['slug'] === 'tunai') {
-            try {
-                $dataRequest = $this->storeTunai($request, $data->id);
-            } catch (\Exception $e) {
-                return Mapper::error($e->getMessage(), $request->method());
-            }
+            return Mapper::single(new SembakoDonateMap(), $dataRequest, $request->method());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Mapper::error($e->getMessage(), $request->method());
         }
-        return Mapper::single(new SembakoDonateMap(), $dataRequest, $request->method());
     }
 
     /**
@@ -82,8 +126,10 @@ class InvestorController extends ApiController
      */
     private function storeSembako(CreateRequest $request, $id)
     {
-        $sembakoPackage = SembakoPackage::findOrFail($request->package_id);
-
+        $sembakoPackage = SembakoPackage::find($request->package_id);
+        if (!$sembakoPackage) {
+            throw new \Exception("Invalid SembakoPackage Id");
+        }
         $data = InvestorItem::create([
             'id' => Uuid::generate(4)->string,
             'investor_id' => $id,
@@ -109,6 +155,10 @@ class InvestorController extends ApiController
      */
     private function storeTunai(CreateRequest $request, $id)
     {
+        $bank = Bank::find($request->bank_id);
+        if (!$bank) {
+            throw new \Exception("Invalid Bank Id");
+        }
         $data = InvestorItem::create([
             'id' => Uuid::generate(4)->string,
             'investor_id' => $id,
@@ -116,7 +166,7 @@ class InvestorController extends ApiController
             'investor_phone' => $request->phone,
             'investor_email' => $request->email,
             'donate_category' => 'tunai',
-            'bank_id' => $request->bank_id,
+            'bank_id' => $bank->id,
             'bank_account' => $request->bank_account,
             'bank_number' => $request->bank_number,
             'amount' => $request->amount,

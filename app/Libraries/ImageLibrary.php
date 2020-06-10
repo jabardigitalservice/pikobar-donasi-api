@@ -41,6 +41,27 @@ class ImageLibrary
         return $imageId;
     }
 
+    public function saveTransferSlip($image, $dir, $name)
+    {
+        $nameSlug = Str::slug($name);
+        $nameLimit =  Str::limit($nameSlug, 191, '');
+        $id = Uuid::generate(4)->string;
+        $resize = ImgMap::make($image);
+        $ext = $image->getClientOriginalExtension();
+        $full = $this->rootDir . $dir . '/' . $nameLimit . '.' . $ext;
+        Storage::disk()->put($full, $resize->encode());
+        $modelImage = new ImageModel();
+        $modelImage->id = $id;
+        $modelImage->name = $nameLimit;
+        $modelImage->extension = Str::slug($image->getClientOriginalExtension());
+        $modelImage->path = $this->rootDir . $dir;
+        $modelImage->image_url = $full;
+        $modelImage->data_type = 'original'; //original/inherit
+        $modelImage->save();
+        $imageId = $modelImage->id;
+        return $imageId;
+    }
+
     public function delete(ImageModel $model)
     {
         Storage::disk()->delete($model->path);
