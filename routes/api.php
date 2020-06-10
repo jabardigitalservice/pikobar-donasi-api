@@ -17,13 +17,13 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'prefix' => 'public/v1'], f
         Route::get('/investor-category', 'MasterController@getInvestorCategory');
         Route::get('/investor-status', 'MasterController@getInvestorStatus');
         Route::get('/donation-type', 'MasterController@getDonationType');
+        Route::get('/bank', 'MasterController@getBank');
     });
 
     Route::group(['as' => 'sembako.', 'prefix' => 'sembako'], function () {
         Route::get('/', 'SembakoPackageController@index');
         Route::get('/items', 'SembakoPackageController@itemIndex');
     });
-
 });
 
 Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api', 'prefix' => 'v1'], function () {
