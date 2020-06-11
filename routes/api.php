@@ -6,10 +6,13 @@ Route::post('/refresh-token', 'ApiLoginController@refresh');
 Route::delete('/logout', 'ApiLoginController@logout')->middleware('auth:api');
 
 Route::group(['as' => 'api::', 'namespace' => 'Api', 'prefix' => 'public/v1'], function () {
+
     // Investor/Donasi
     Route::group(['as' => 'donate.', 'prefix' => 'donate'], function () {
         Route::post('/create', 'InvestorController@store');
+        Route::get('/show/{id}', 'InvestorController@showInvestor');
     });
+
     // MasterController
     Route::group(['as' => 'master.', 'prefix' => 'master'], function () {
         Route::get('/material', 'MasterController@getMaterial');
@@ -24,6 +27,10 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'prefix' => 'public/v1'], f
         Route::get('/', 'SembakoPackageController@index');
         Route::get('/items', 'SembakoPackageController@itemIndex');
     });
+
+    Route::group(['as' => 'statistic.', 'prefix' => 'statistic'], function () {
+        Route::get('/', 'StatistikController@index');
+    });
 });
 
 Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api', 'prefix' => 'v1'], function () {
@@ -32,6 +39,11 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api',
     Route::group(['as' => 'user.', 'prefix' => 'user'], function () {
         Route::get('/', 'UserController@index');
         Route::post('/create', 'UserController@store');
+    });
+
+    Route::group(['as' => 'statistic.', 'prefix' => 'statistic'], function () {
+        Route::get('/', 'StatistikController@index');
+        Route::post('/update', 'StatistikController@update');
     });
 
     Route::group(['as' => 'sembako.', 'prefix' => 'sembako'], function () {

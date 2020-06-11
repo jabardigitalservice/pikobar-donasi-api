@@ -58,7 +58,7 @@ class Investor extends Model
         'donate_status',
         'donate_status_name',
         'invoice_number',
-        'files',
+        'attachment_id',
         'show_name',
         'donate_date',
         'last_modified_by',
@@ -68,5 +68,10 @@ class Investor extends Model
     public function items()
     {
         return $this->hasMany('App\Models\InvestorItem', 'investor_id', 'id');
+    }
+
+    public function files()
+    {
+        return $this->belongsTo(Files::class, 'attachment_id', 'id');
     }
 }

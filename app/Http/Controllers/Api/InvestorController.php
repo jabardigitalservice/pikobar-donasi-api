@@ -6,7 +6,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Requests\Investor\CreateRequest;
 use App\Libraries\ConstantParser;
 use App\Libraries\FilesLibrary;
-use App\Libraries\ImageLibrary;
+use App\Mappers\Investor\InvestorMapper;
 use App\Mappers\Investor\SembakoDonateMap;
 use App\Models\Bank;
 use App\Models\Constants;
@@ -19,8 +19,35 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Webpatser\Uuid\Uuid;
 
+/**
+ * Class InvestorController.
+ *
+ * @package App\Http\Controllers\Api
+ */
 class InvestorController extends ApiController
 {
+    /**
+     * Get Investor detail, Only For Admin.
+     * ini dipergunakan oleh admin untuk approval donatur,
+     * yang nantinya akan ditransfer ke table warehouse (quantity langsung dihitung berdasarkan item).
+     *
+     * @param $id
+     * @param Request $request
+     * @return mixed
+     */
+    public function showInvestor($id, Request $request)
+    {
+        try {
+            $item = Investor::find($id);
+            if (!$item) {
+                throw new \Exception("Invalid Investor Id");
+            }
+            return Mapper::single(new InvestorMapper(), $item, $request->method());
+        } catch (\Exception $e) {
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
     public function store(CreateRequest $request)
     {
         //investor category
@@ -71,10 +98,11 @@ class InvestorController extends ApiController
                                 $imageData[$dataId] = $tempExtra;
                             }
                         } else {
-                            $key_id = !empty($request->$key . '_old') ? $request->$key . '_old' : null;
-                            $imageData[$key_id] = array();
+                            $dataId = !empty($request->$key . '_old') ? $request->$key . '_old' : null;
+                            $imageData[$dataId] = array();
                         }
                     }
+                    $data->attachment_id = $dataId;
                     $data->save();
                     $dataRequest = $this->storeSembako($request, $data->id);
                     DB::commit();
@@ -87,10 +115,9 @@ class InvestorController extends ApiController
                     foreach ($request->file() as $key => $file) {
                         if ($request->hasFile($key)) {
                             if ($request->file($key)->isValid()) {
-                                $fileLib = new ImageLibrary();
-                                $savePath = 'investor/transfer';
+                                $fileLib = new FilesLibrary();
                                 $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
-                                $dataId = $fileLib->saveTransferSlip($request->file($key), $savePath, $name);
+                                $dataId = $fileLib->saveTransferSlip($request->file($key), $name);
                                 $tempExtra = [];
                                 $tempExtra['id'] = Uuid::generate(4)->string;
                                 $tempExtra['created_at'] = date('Y-m-d');
@@ -98,10 +125,11 @@ class InvestorController extends ApiController
                                 $imageData[$dataId] = $tempExtra;
                             }
                         } else {
-                            $key_id = !empty($request->$key . '_old') ? $request->$key . '_old' : null;
-                            $imageData[$key_id] = array();
+                            $dataId = !empty($request->$key . '_old') ? $request->$key . '_old' : null;
+                            $imageData[$dataId] = array();
                         }
                     }
+                    $data->attachment_id = $dataId;
                     $data->save();
                     $dataRequest = $this->storeTunai($request, $data->id);
                     DB::commit();

@@ -4,6 +4,8 @@ namespace App\Models;
 
 class Constants
 {
+    public const DEFAULT_STATISTIC_ID = '1cba241c-1e42-40f1-829c-85067e1618d3';
+
     public const UOM = [
         array('id' => '00000001-0001-43ad-a18c-000000000001', 'slug' => 'batang', 'name' => 'Batang'),
         array('id' => '00000001-0001-43ad-a18c-000000000002', 'slug' => 'buah', 'name' => 'Buah'),
@@ -47,6 +49,7 @@ class Constants
     public const INVESTOR_STATUS = [
         array('id' => '11000000-0001-13ab-b18d-000000000001', 'slug' => 'pending', 'name' => 'Pending'),
         array('id' => '11000000-0002-13ab-b18d-000000000002', 'slug' => 'verified', 'name' => 'Verified'),
+        array('id' => '11000000-0002-13ab-b18d-000000000003', 'slug' => 'rejected', 'name' => 'Rejected'),
     ];
 
     public const INVESTOR_CATEGORIES = [

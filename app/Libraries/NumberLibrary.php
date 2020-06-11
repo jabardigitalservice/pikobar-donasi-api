@@ -25,6 +25,25 @@ class NumberLibrary
         return str_replace(array('VIV', 'LXL', 'DCD'), array('IX', 'XC', 'CM'), $return);
     }
 
+    /**
+     * Parse nilai 1.000.000,00 jadi 1000000.
+     *
+     * @param $string_money
+     * @param string $separator
+     * @return float|int
+     */
+    public static function moneyToNumber($string_money, $separator = '.')
+    {
+        $_val = str_replace($separator, "", $string_money);
+        if (is_nan($_val)) {
+            $r = 0;
+        } else {
+            $r = (float)$_val;
+        }
+        return $r;
+    }
+
+
     private static function generateSign($hmac = false)
     {
         $string_to_sign = Uuid::generate(4)->string;

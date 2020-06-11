@@ -62,4 +62,9 @@ class InvestorItem extends Model
         'last_modified_by',
         'deleted_by',
     ];
+
+    public function bank()
+    {
+        return $this->belongsTo('App\Models\Bank', 'bank_id', 'id');
+    }
 }

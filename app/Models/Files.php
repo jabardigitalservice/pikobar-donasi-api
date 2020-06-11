@@ -68,7 +68,7 @@ class Files extends Model
      *
      * @return string
      */
-    public function getImageUrlAttribute()
+    public function getFileUrlAttribute()
     {
         return \Storage::url($this->attributes['file_url']);
     }
