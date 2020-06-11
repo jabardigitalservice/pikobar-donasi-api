@@ -21,7 +21,6 @@ use Webpatser\Uuid\Uuid;
 
 class InvestorController extends ApiController
 {
-    //@todo nomor invoice belum
     public function store(CreateRequest $request)
     {
         //investor category
@@ -51,9 +50,11 @@ class InvestorController extends ApiController
             $data->donate_id = $donateCategoryId['id'];
             $data->donate_category = $donateCategoryId['slug'];
             $data->donate_category_name = $donateCategoryId['name'];
-            $data->invoice_number = (string)now();
             $data->show_name = !$request->show_name ? false : true;
+            $data->donate_status = $donateStatus['slug'];
+            $data->donate_status_name = $donateStatus['name'];
             $data->donate_date = date('Y-m-d');
+            $data->invoice_number = \App\Libraries\NumberLibrary::createInvoice();
             $dataRequest = null;
             if ($donateCategoryId['slug'] === 'logistik') {
                 try {
