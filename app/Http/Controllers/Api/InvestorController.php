@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\NewInvestorEvent;
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\Investor\CreateRequest;
+use App\Http\Requests\Investor\VerificationRequest;
 use App\Libraries\ConstantParser;
 use App\Libraries\FilesLibrary;
 use App\Mappers\Investor\InvestorMapper;
@@ -48,6 +50,32 @@ class InvestorController extends ApiController
         }
     }
 
+    public function verification($id, VerificationRequest $request)
+    {
+        try {
+            $donateStatus = ConstantParser::searchById($request->donate_status_id,
+                Constants::INVESTOR_STATUS);
+            if ($donateStatus['slug'] === 'verified') {
+                throw new \Exception("Already Verified");
+            }
+            DB::beginTransaction();
+            $item = Investor::find($id);
+            if (!$item) {
+                throw new \Exception("Invalid Investor Id");
+            }
+            $item->donate_status = $donateStatus['slug'];
+            $item->donate_status_name = $donateStatus['name'];
+            $item->update();
+            //@TODO COPY VALUE KE WAREHOUSE (KARENA TABLE INI TIDAK UNTUK READ)
+            // Commit to database
+            DB::commit();
+            return Mapper::single(new InvestorMapper(), $item, $request->method());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
     public function store(CreateRequest $request)
     {
         //investor category
@@ -56,8 +84,8 @@ class InvestorController extends ApiController
         //logistik,medis,etc
         $donateCategoryId = ConstantParser::searchById($request->donate_id, Constants::DONATION_CATEGORIES);
 
-        //pending,verified
-        $donateStatus = ConstantParser::searchBySlug('pending', Constants::INVESTOR_STATUS);
+        //not_verified,verified,reject
+        $donateStatus = ConstantParser::searchBySlug('not_verified', Constants::INVESTOR_STATUS);
 
         $investor_name = $request->investor_name;
         $phone = $request->phone;
@@ -66,7 +94,7 @@ class InvestorController extends ApiController
         DB::beginTransaction();
         try {
             $data = new Investor();
-            $data->id = Uuid::generate(4)->string;
+            $data->id = (string)Uuid::generate(4)->string;
             $data->investor_name = $investor_name;
             $data->category_id = $investorCategoryId['id'];
             $data->category_slug = $investorCategoryId['slug'];
@@ -85,60 +113,90 @@ class InvestorController extends ApiController
             $dataRequest = null;
             if ($donateCategoryId['slug'] === 'logistik') {
                 try {
-                    foreach ($request->file() as $key => $file) {
-                        if ($request->hasFile($key)) {
-                            if ($request->file($key)->isValid()) {
-                                $fileLib = new FilesLibrary();
-                                $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
-                                $dataId = $fileLib->saveDocument($request->file($key), $name);
-                                $tempExtra = [];
-                                $tempExtra['id'] = Uuid::generate(4)->string;
-                                $tempExtra['created_at'] = date('Y-m-d');
-                                $tempExtra['updated_at'] = date('Y-m-d');
-                                $imageData[$dataId] = $tempExtra;
-                            }
-                        } else {
-                            $dataId = !empty($request->$key . '_old') ? $request->$key . '_old' : null;
-                            $imageData[$dataId] = array();
+                    if ($request->hasFile('files')) {
+                        if ($request->file('files')->isValid()) {
+                            $fileLib = new FilesLibrary();
+                            $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
+                            $dataId = $fileLib->saveDocument($request->file('files'), $name);
+                            $tempExtra = [];
+                            $tempExtra['id'] = Uuid::generate(4)->string;
+                            $tempExtra['created_at'] = date('Y-m-d');
+                            $tempExtra['updated_at'] = date('Y-m-d');
+                            $imageData[$dataId] = $tempExtra;
                         }
                     }
                     $data->attachment_id = $dataId;
                     $data->save();
-                    $dataRequest = $this->storeSembako($request, $data->id);
+
+
+                    $this->storeSembako($request, $data->id);
+                    // Commit to database
                     DB::commit();
+
+                    // Create an event
+                    event(new NewInvestorEvent($data));
+
                 } catch (\Exception $e) {
                     DB::rollBack();
                     return Mapper::error($e->getMessage(), $request->method());
                 }
             } else if ($donateCategoryId['slug'] === 'tunai') {
                 try {
-                    foreach ($request->file() as $key => $file) {
-                        if ($request->hasFile($key)) {
-                            if ($request->file($key)->isValid()) {
-                                $fileLib = new FilesLibrary();
-                                $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
-                                $dataId = $fileLib->saveTransferSlip($request->file($key), $name);
-                                $tempExtra = [];
-                                $tempExtra['id'] = Uuid::generate(4)->string;
-                                $tempExtra['created_at'] = date('Y-m-d');
-                                $tempExtra['updated_at'] = date('Y-m-d');
-                                $imageData[$dataId] = $tempExtra;
-                            }
-                        } else {
-                            $dataId = !empty($request->$key . '_old') ? $request->$key . '_old' : null;
-                            $imageData[$dataId] = array();
+                    if ($request->hasFile('files')) {
+                        if ($request->file('files')->isValid()) {
+                            $fileLib = new FilesLibrary();
+                            $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
+                            $dataId = $fileLib->saveTransferSlip($request->file('files'), $name);
+                            $tempExtra = [];
+                            $tempExtra['id'] = Uuid::generate(4)->string;
+                            $tempExtra['created_at'] = date('Y-m-d');
+                            $tempExtra['updated_at'] = date('Y-m-d');
+                            $imageData[$dataId] = $tempExtra;
                         }
                     }
                     $data->attachment_id = $dataId;
                     $data->save();
-                    $dataRequest = $this->storeTunai($request, $data->id);
+
+                    $this->storeTunai($request, $data->id);
+
+                    // Commit to database
                     DB::commit();
+                    // Create an event
+                    event(new NewInvestorEvent($data));
+
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    return Mapper::error($e->getMessage(), $request->method());
+                }
+            } else if ($donateCategoryId['slug'] === 'medis') {
+                try {
+                    if ($request->hasFile('files')) {
+                        if ($request->file('files')->isValid()) {
+                            $fileLib = new FilesLibrary();
+                            $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
+                            $dataId = $fileLib->saveDocument($request->file('files'), $name);
+                            $tempExtra = [];
+                            $tempExtra['id'] = Uuid::generate(4)->string;
+                            $tempExtra['created_at'] = date('Y-m-d');
+                            $tempExtra['updated_at'] = date('Y-m-d');
+                            $imageData[$dataId] = $tempExtra;
+                        }
+                    }
+                    $data->attachment_id = $dataId;
+                    $data->save();
+
+                    $this->storeMedis($request, $data->id);
+
+                    // Commit to database
+                    DB::commit();
+                    // Create an event
+                    event(new NewInvestorEvent($data));
                 } catch (\Exception $e) {
                     DB::rollBack();
                     return Mapper::error($e->getMessage(), $request->method());
                 }
             }
-            return Mapper::single(new SembakoDonateMap(), $dataRequest, $request->method());
+            return Mapper::single(new SembakoDonateMap(), $data, $request->method());
         } catch (\Exception $e) {
             DB::rollBack();
             return Mapper::error($e->getMessage(), $request->method());
@@ -207,9 +265,38 @@ class InvestorController extends ApiController
      * Jika donasinya adalah berupa barang barang medis (inputan bebas).
      *
      * @param Request $request
+     * @param $id
+     * @return array
+     * @throws \Exception
      */
-    private function storeMedis(Request $request)
+    private function storeMedis(Request $request, $id)
     {
-
+        if (!empty($request->items)) {
+            $syncItems = [];
+            foreach ($request->items as $item) {
+                if (array_key_exists('id', $item)
+                    && array_key_exists('quantity', $item)
+                    && array_key_exists('package_name', $item)
+                ) {
+                    $uomId = ConstantParser::searchById($item['uom'],
+                        Constants::UOM);
+                    $syncItems[$item['id']] = InvestorItem::create([
+                        'id' => Uuid::generate(4)->string,
+                        'investor_id' => $id,
+                        'investor_name' => $request->investor_name,
+                        'investor_phone' => $request->phone,
+                        'investor_email' => $request->email,
+                        'donate_category' => 'medis',
+                        'item_package_id' => $item['id'],
+                        'item_package_sku' => Str::slug($item['package_name']),
+                        'item_package_name' => $item['package_name'],
+                        'item_uom_slug' => $uomId['slug'],
+                        'item_uom_name' => $uomId['name'],
+                        'quantity' => $item['quantity'],
+                    ]);
+                }
+            }
+            return $syncItems;
+        }
     }
 }

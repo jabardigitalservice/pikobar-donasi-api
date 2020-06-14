@@ -18,6 +18,11 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+
+        // Event jika investor baru berdonasi
+        \App\Events\NewInvestorEvent::class => [
+            \App\Listeners\NewInvestorListener::class,
+        ]
     ];
 
     /**
@@ -28,7 +33,5 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
-
-        //
     }
 }

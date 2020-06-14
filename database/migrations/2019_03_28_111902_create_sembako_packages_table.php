@@ -17,13 +17,13 @@ class CreateSembakoPackagesTable extends Migration
     public function up()
     {
         Schema::create('sembako_packages', function (Blueprint $table) {
-            $table->string('id', 255);
+            $table->string('id', 50);
             $table->string('sku', 100);
             $table->string('package_name', 100);
             $table->text('package_description')->nullable();
             $table->tinyInteger('status')->default(1)->nullable()->comment('1=aktif 0 = nonaktif');
-            $table->string('last_modified_by', 255)->nullable();
-            $table->string('deleted_by', 255)->nullable();
+            $table->string('last_modified_by', 50)->nullable();
+            $table->string('deleted_by', 50)->nullable();
             $table->primary(['id']);
             $table->timestamps();
             $table->softDeletes();
@@ -34,16 +34,16 @@ class CreateSembakoPackagesTable extends Migration
         });
 
         Schema::create('sembako_package_items', function (Blueprint $table) {
-            $table->string('id', 255);
+            $table->string('id', 50);
             $table->string('item_name');
             $table->string('item_sku');
             $table->integer('quantity')->default(0);
-            $table->string('uom', 255)->nullable();
-            $table->string('uom_name', 255)->nullable();
+            $table->string('uom', 50)->nullable();
+            $table->string('uom_name')->nullable();
             $table->text('package_description')->nullable();
             $table->tinyInteger('status')->default(1)->comment('1=aktif 0 = nonaktif');
-            $table->string('last_modified_by', 255)->nullable();
-            $table->string('deleted_by', 255)->nullable();
+            $table->string('last_modified_by', 50)->nullable();
+            $table->string('deleted_by', 50)->nullable();
             $table->primary(['id']);
             $table->timestamps();
             $table->softDeletes();
@@ -52,9 +52,9 @@ class CreateSembakoPackagesTable extends Migration
         });
 
         Schema::create('sembako_many', function (Blueprint $table) {
-            $table->string('id', 255);
-            $table->string('package_id', 255);
-            $table->string('item_id', 255);
+            $table->string('id', 50);
+            $table->string('package_id', 50);
+            $table->string('item_id', 50);
             $table->timestamps();
             $table->primary(['id']);
 

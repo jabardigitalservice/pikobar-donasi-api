@@ -29,14 +29,14 @@ class CreateUsersTable extends Migration
 
         Schema::create('users', function (Blueprint $table) {
 
-            $table->string('id', 255);
+            $table->string('id', 50);
             $table->string('username', 150);
             $table->string('email')->unique();
             $table->string('first_name', 150)->nullable();
             $table->string('last_name', 150)->nullable();
             $table->string('gender', 20)->comment('male, female, other only')->nullable();
             $table->string('password');
-            $table->string('avatar', 255)->nullable();
+            $table->string('avatar', 50)->nullable();
             $table->tinyInteger('active')->default(1)->comment('0 = Not Active, 1 = Active');
             $table->rememberToken();
             $table->timestamp('email_verified_at')->nullable();
@@ -51,9 +51,9 @@ class CreateUsersTable extends Migration
         });
 
         Schema::create('roles', function (Blueprint $table) {
-            $table->string('id', 255);
+            $table->string('id', 50);
             $table->string('role_name', 150)->unique();
-            $table->string('slug', 200)->unique();
+            $table->string('slug', 191)->unique();
             $table->text('description')->nullable();
             $table->tinyInteger('is_active')->default(1)->comment('0 = Not Active, 1 = Active');
             $table->tinyInteger('is_default')->default(1)->comment('1 = Cannot delete by program');
@@ -65,7 +65,7 @@ class CreateUsersTable extends Migration
         });
 
         Schema::create('permissions', function (Blueprint $table) {
-            $table->string('id', 255);
+            $table->string('id', 50);
             $table->string('name');
             $table->string('guard_name');
 
@@ -74,9 +74,9 @@ class CreateUsersTable extends Migration
         });
 
         Schema::create('user_role', function (Blueprint $table) {
-            $table->string('id', 255);
-            $table->string('user_id', 255);
-            $table->string('role_id', 255);
+            $table->string('id', 50);
+            $table->string('user_id', 50);
+            $table->string('role_id', 50);
 
             $table->primary('id');
             $table->timestamps();
@@ -85,9 +85,9 @@ class CreateUsersTable extends Migration
         });
 
         Schema::create('permission_roles', function (Blueprint $table) {
-            $table->string('id', 255);
-            $table->string('role_id', 255);
-            $table->string('permission_id', 255);
+            $table->string('id', 50);
+            $table->string('role_id', 50);
+            $table->string('permission_id', 50);
 
             $table->primary('id');
             $table->timestamps();

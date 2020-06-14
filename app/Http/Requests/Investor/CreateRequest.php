@@ -53,11 +53,12 @@ class CreateRequest extends FormRequest
             $rules['files'] = 'required|mimes:jpeg,jpg,png';
         } else {
             $rules['items'] = 'array';
+            $rules['items.*.id'] = 'required';
+            $rules['items.*.package_name'] = 'required';
             $rules['items.*.quantity'] = 'required|min:1|max:9999999999';
             $rules['items.*.oum'] = 'required';
-            $rules['files'] = 'required|mimes:docx,doc,pdf';
+            $rules['files'] = 'required|mimes:docx,doc,pdf,jpeg,jpg,png';
         }
-
         return $rules;
     }
 

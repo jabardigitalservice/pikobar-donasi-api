@@ -15,7 +15,6 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'prefix' => 'public/v1'], f
 
     // MasterController
     Route::group(['as' => 'master.', 'prefix' => 'master'], function () {
-        Route::get('/material', 'MasterController@getMaterial');
         Route::get('/uom', 'MasterController@getUom');
         Route::get('/investor-category', 'MasterController@getInvestorCategory');
         Route::get('/investor-status', 'MasterController@getInvestorStatus');
@@ -31,6 +30,13 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'prefix' => 'public/v1'], f
     Route::group(['as' => 'statistic.', 'prefix' => 'statistic'], function () {
         Route::get('/', 'StatistikController@index');
     });
+
+    //External Apps
+    Route::group(['namespace' => 'External'], function () {
+        Route::get('/external/logistic-material', 'LogisticController@getMaterial');
+        Route::get('/external/logistic', 'LogisticController@getLogisticNeeds');
+    });
+
 });
 
 Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api', 'prefix' => 'v1'], function () {
@@ -39,6 +45,11 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api',
     Route::group(['as' => 'user.', 'prefix' => 'user'], function () {
         Route::get('/', 'UserController@index');
         Route::post('/create', 'UserController@store');
+    });
+
+    Route::group(['as' => 'donate.', 'prefix' => 'donate'], function () {
+        Route::get('/show/{id}', 'InvestorController@showInvestor');
+        Route::post('/verification/{id}', 'InvestorController@verification');
     });
 
     Route::group(['as' => 'statistic.', 'prefix' => 'statistic'], function () {

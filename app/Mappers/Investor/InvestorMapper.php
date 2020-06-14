@@ -7,7 +7,6 @@ use App\Services\Mapper\MapperContract;
 
 class InvestorMapper extends BaseMapper implements MapperContract
 {
-
     /**
      * Mapper class must implement this function in order to make list() function work.
      *
@@ -16,9 +15,6 @@ class InvestorMapper extends BaseMapper implements MapperContract
      */
     function single($item)
     {
-        foreach ($item->items as $key => $account) {
-
-        }
         $itemList = array();
         foreach ($item->items as $idx => $dt) {
             $itemList[$idx] = $dt;
@@ -60,5 +56,14 @@ class InvestorMapper extends BaseMapper implements MapperContract
     function edit($item)
     {
         // TODO: Implement edit() method.
+    }
+
+    function list($items)
+    {
+        $result = [];
+        foreach ($items as $item) {
+            $result[] = $this->single($item);
+        }
+        return $result;
     }
 }
