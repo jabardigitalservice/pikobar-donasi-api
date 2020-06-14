@@ -106,7 +106,6 @@ class LogisticController extends Controller
                         );
                         $num++;
                     }
-                    \App\Libraries\SyncDatabase::writeData($items);
                     return Mapper::array($items, $request->method());
                 } else {
                     return Mapper::object($dataRecords['count'], $request->method());
