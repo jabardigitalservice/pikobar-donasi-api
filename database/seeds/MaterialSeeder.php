@@ -2,7 +2,7 @@
 
 use Flynsarmy\CsvSeeder\CsvSeeder;
 
-class BanksSeeder extends CsvSeeder
+class MaterialSeeder extends CsvSeeder
 {
     /**
      * Run the database seeds.
@@ -11,16 +11,21 @@ class BanksSeeder extends CsvSeeder
      */
     public function __construct()
     {
-        $this->table = 'banks';
+        $this->table = 'materials';
         $this->csv_delimiter = ',';
-        $this->filename = base_path() . '/database/seeds/csv/banks.csv';
+        $this->filename = base_path() . '/database/seeds/csv/materials.csv';
         $this->mapping = [
             0 => 'id',
-            1 => 'code',
-            2 => 'name',
-            3 => 'xendit_code',
-            4 => 'created_at',
-            5 => 'updated_at',
+            1 => 'id_pos',
+            2 => 'matg_id',
+            3 => 'sisa',
+            4 => 'masuk',
+            5 => 'distribusi',
+            6 => 'status',
+            7 => 'status_medis',
+            8 => 'is_show',
+            9 => 'created_at',
+            10 => 'updated_at'
         ];
     }
 

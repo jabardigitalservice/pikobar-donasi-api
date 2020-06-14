@@ -15,14 +15,7 @@ abstract class BaseMapper
      * @param $items
      * @return array
      */
-    public function list($items)
-    {
-        $result = [];
-        foreach ($items as $item) {
-            $result[] = $this->single($item);
-        }
-        return $result;
-    }
+    abstract function list($items);
 
     /**
      * Mapper class must implement this function in order to make list() function work.

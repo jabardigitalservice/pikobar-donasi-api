@@ -7,6 +7,7 @@ use App\Http\Requests\Sembako\CreateItemRequest;
 use App\Http\Requests\Sembako\CreateRequest;
 use App\Http\Requests\Sembako\UpdateItemRequest;
 use App\Http\Requests\Sembako\UpdateRequest;
+use App\Libraries\ConstantParser;
 use App\Mappers\SembakoItemPackageMap;
 use App\Mappers\SembakoPackageMap;
 use App\Models\Constants;
@@ -106,7 +107,7 @@ class SembakoPackageController extends Controller
     {
         \DB::beginTransaction();
         try {
-            $uomId = $this->searchUomId($request->uom, Constants::UOM);
+            $uomId = ConstantParser::searchById($request->uom, Constants::UOM);
             if (!$uomId) {
                 return Mapper::error("UOM tidak tersedia.", $request->method());
             }
@@ -135,7 +136,7 @@ class SembakoPackageController extends Controller
         \DB::beginTransaction();
         try {
             $sembako = SembakoPackageItem::findOrFail($id);
-            $uomId = $this->searchUomId($request->uom, Constants::UOM);
+            $uomId = ConstantParser::searchById($request->uom, Constants::UOM);
             if (!$uomId) {
                 return Mapper::error("UOM tidak tersedia.", $request->method());
             }
@@ -212,15 +213,5 @@ class SembakoPackageController extends Controller
             \DB::rollBack();
             return Mapper::error("item tidak ada", $request->method());
         }
-    }
-
-    private function searchUomId($id, $array)
-    {
-        foreach ($array as $key => $val) {
-            if ($val['id'] === $id) {
-                return $val;
-            }
-        }
-        return null;
     }
 }

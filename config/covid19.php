@@ -14,6 +14,6 @@ return [
     */
     'document_path' => env('document_path', 'documents'),
     'oauth_client_url' => env('OAUTH_CLIENT_URL', '/oauth/token'),
-    'api_key_logistic' => env('API_KEY_LOGISTIC', '480d0aeb78bd0064d45ef6b2254be9b3'),
-    'api_url_logistic' => env('API_URL_LOGISTIC', 'https://dashboard-pikobar.digitalservice.id/api-pt-pos/master/material'),
+    'api_key_logistic' => env('API_KEY_LOGISTIC', ''),
+    'api_url_logistic' => env('API_URL_LOGISTIC', ''),
 ];

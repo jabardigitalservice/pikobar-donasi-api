@@ -49,4 +49,19 @@ class SembakoPackageMap extends BaseMapper implements MapperContract
     {
         // TODO: Implement edit() method.
     }
+
+    /**
+     * Loop through single() function to generate multiple mapped data.
+     *
+     * @param $items
+     * @return array
+     */
+    function list($items)
+    {
+        $result = [];
+        foreach ($items as $item) {
+            $result[] = $this->single($item);
+        }
+        return $result;
+    }
 }

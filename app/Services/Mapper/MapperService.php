@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Services\Mapper;
-
 
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Validation\Validator;
@@ -379,14 +377,12 @@ class MapperService
         $item = $object;
         $meta = $this->meta($code, $version, $method, $message);
         $pageInfo = $this->pageInfo(url()->full());
-
         $data = [
             "message" => $message,
-            "item" => (object)$item,
+            "item" => $object,
             "items" => $items,
             "additional" => $additional
         ];
-
         $response = [
             "meta" => $meta,
             "page_info" => $pageInfo,

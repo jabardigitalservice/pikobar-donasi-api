@@ -14,7 +14,7 @@ class CreateStatisticsTable extends Migration
     public function up()
     {
         Schema::create('statistics', function (Blueprint $table) {
-            $table->uuid('id')->unique()->primary();
+            $table->string('id', 50)->unique()->primary();
             $table->bigInteger('personal_investor')->default(0)->comment('Jumlah donatur perorangan');
             $table->bigInteger('company_investor')->default(0)->comment('Jumlah donatur percompany');
             $table->bigInteger('total_goods')->default(0)->comment('Jumlah barang yang terkumpul');
