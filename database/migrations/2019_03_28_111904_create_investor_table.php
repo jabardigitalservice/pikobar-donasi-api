@@ -33,6 +33,7 @@ class CreateInvestorTable extends Migration
             $table->string('invoice_number', 50)->comment('nomor invoice yang digenerate oleh sistem');
             $table->string('attachment_id', 50)->nullable()->comment('uuid dokumen pernyataan / bukti transfer');
             $table->tinyInteger('show_name')->default(0)->comment('1=ditampilkan 0 = tidak ditampilkan');
+            $table->tinyInteger('award_claim')->default(0)->comment('1=piagam sudah diterima 0 = piagam belum diterima');
             $table->dateTime('donate_date')->comment('tanggal donasi dibuat');
             $table->string('last_modified_by', 50)->nullable();
             $table->string('deleted_by', 50)->nullable();

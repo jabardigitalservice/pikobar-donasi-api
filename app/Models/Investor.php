@@ -60,6 +60,7 @@ class Investor extends Model
         'invoice_number',
         'attachment_id',
         'show_name',
+        'award_claim',
         'donate_date',
         'last_modified_by',
         'deleted_by',

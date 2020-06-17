@@ -48,6 +48,7 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api',
     });
 
     Route::group(['as' => 'donate.', 'prefix' => 'donate'], function () {
+        Route::get('/', 'InvestorController@index');
         Route::get('/show/{id}', 'InvestorController@showInvestor');
         Route::post('/verification/{id}', 'InvestorController@verification');
     });

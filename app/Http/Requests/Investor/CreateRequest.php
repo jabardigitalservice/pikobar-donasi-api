@@ -56,7 +56,7 @@ class CreateRequest extends FormRequest
             $rules['items.*.id'] = 'required';
             $rules['items.*.package_name'] = 'required';
             $rules['items.*.quantity'] = 'required|min:1|max:9999999999';
-            $rules['items.*.oum'] = 'required';
+            $rules['items.*.uom'] = 'required';
             $rules['files'] = 'required|mimes:docx,doc,pdf,jpeg,jpg,png';
         }
         return $rules;

@@ -9,6 +9,8 @@ use App\Http\Requests\Investor\VerificationRequest;
 use App\Libraries\ConstantParser;
 use App\Libraries\FilesLibrary;
 use App\Mappers\Investor\InvestorMapper;
+use App\Mappers\Investor\ListInvestorSembako;
+use App\Mappers\Investor\ListInvestorTunai;
 use App\Mappers\Investor\SembakoDonateMap;
 use App\Models\Bank;
 use App\Models\Constants;
@@ -18,6 +20,7 @@ use App\Models\SembakoPackage;
 use App\Services\Mapper\Facades\Mapper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Webpatser\Uuid\Uuid;
 
@@ -28,6 +31,33 @@ use Webpatser\Uuid\Uuid;
  */
 class InvestorController extends ApiController
 {
+    public function index(Request $request)
+    {
+        try {
+            $limit = $request->has('limit') ? $request->input('limit') : 141;
+            $sort = $request->has('sort') ? $request->input('sort') : 'investors.created_at';
+            $order = $request->has('order') ? $request->input('order') : 'DESC';
+            $type = $request->has('type') ? $request->input('type') : 'tunai';
+            $conditions = '1 = 1';
+
+            $conditions .= " AND donate_category = '$type'";
+
+            $paged = Investor::select('*')
+                ->whereRaw($conditions)
+                ->orderBy($sort, $order)
+                ->paginate($limit);
+            $countAll = Investor::count();
+            if ($type === 'tunai') {
+                return Mapper::list(new ListInvestorTunai(), $paged, $countAll, $request->method());
+            } else if ($type === 'logistik') {
+                return Mapper::list(new ListInvestorSembako(), $paged, $countAll, $request->method());
+            }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
     /**
      * Get Investor detail, Only For Admin.
      * ini dipergunakan oleh admin untuk approval donatur,
@@ -277,6 +307,7 @@ class InvestorController extends ApiController
                 if (array_key_exists('id', $item)
                     && array_key_exists('quantity', $item)
                     && array_key_exists('package_name', $item)
+                    && array_key_exists('uom', $item)
                 ) {
                     $uomId = ConstantParser::searchById($item['uom'],
                         Constants::UOM);
