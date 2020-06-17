@@ -17,6 +17,8 @@ class StatisticSeeder extends Seeder
             'company_investor' => 0,
             'total_goods' => 0,
             'total_cash' => 0,
+            'date_input' => now(),
+            'is_last' => 1
         ]);
     }
 }

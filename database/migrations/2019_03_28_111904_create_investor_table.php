@@ -32,6 +32,7 @@ class CreateInvestorTable extends Migration
             $table->string('donate_status_name', 191)->nullable()->comment('name dari DONATE_STATUS eg: (pending, Verified)');
             $table->string('invoice_number', 50)->comment('nomor invoice yang digenerate oleh sistem');
             $table->string('attachment_id', 50)->nullable()->comment('uuid dokumen pernyataan / bukti transfer');
+            $table->string('profile_picture', 191)->nullable()->comment('full path logo jika perusahaan');
             $table->tinyInteger('show_name')->default(0)->comment('1=ditampilkan 0 = tidak ditampilkan');
             $table->tinyInteger('award_claim')->default(0)->comment('1=piagam sudah diterima 0 = piagam belum diterima');
             $table->dateTime('donate_date')->comment('tanggal donasi dibuat');

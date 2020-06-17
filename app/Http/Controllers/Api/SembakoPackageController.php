@@ -171,6 +171,20 @@ class SembakoPackageController extends Controller
             $sembako->status = !$request->status ? false : true;
             $sembako->last_modified_by = auth('api')->user()->id;
             $sembako->update();
+            if (!empty($request->items)) {
+                $syncMaterials = [];
+                foreach ($request->items as $material) {
+                    if (array_key_exists('id', $material)) {
+                        $materialModel = SembakoPackageItem::findOrFail($material['id']);
+                        $tempExtra = [];
+                        $tempExtra['id'] = Uuid::generate(4)->string;
+                        $tempExtra['created_at'] = date('Y-m-d');
+                        $tempExtra['updated_at'] = date('Y-m-d');
+                        $syncMaterials[$materialModel->id] = $tempExtra;
+                    }
+                }
+                $sembako->items()->sync($syncMaterials);
+            }
             \DB::commit();
             return Mapper::single(new SembakoPackageMap(), $sembako, $request->method());
         } catch (\Exception $e) {

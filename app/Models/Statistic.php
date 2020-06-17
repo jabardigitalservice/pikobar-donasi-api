@@ -45,6 +45,9 @@ class Statistic extends Model
         'company_investor',
         'total_goods',
         'total_cash',
+        'last_key',
+        'date_input',
+        'is_last',
     ];
 
     /**

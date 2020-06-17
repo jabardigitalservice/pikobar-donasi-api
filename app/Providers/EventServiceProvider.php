@@ -22,7 +22,11 @@ class EventServiceProvider extends ServiceProvider
         // Event jika investor baru berdonasi
         \App\Events\NewInvestorEvent::class => [
             \App\Listeners\NewInvestorListener::class,
-        ]
+        ],
+
+        \App\Events\NewInvestorAwardEvent::class => [
+            \App\Listeners\NewInvestorAwardListener::class,
+        ],
     ];
 
     /**

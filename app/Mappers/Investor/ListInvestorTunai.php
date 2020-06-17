@@ -25,6 +25,7 @@ class ListInvestorTunai extends BaseMapper implements MapperContract
             $date    =     new \DateTime($item->donate_date);
             $result[$id]['donate_date'] = $date->format('d-m-Y');
             $result[$id]['attachment_id'] = $item->attachment_id ? asset($item->files->getFileUrlAttribute()) : '';
+            $result[$id]['profile_picture'] = $item->profile_picture ? asset($item->getProfilePictureAttribute()) : '';
             if (!empty($item->items)) {
                 foreach ($item->items as $idx => $itemData) {
                     $result[$id]['amount'] = $itemData->amount;
