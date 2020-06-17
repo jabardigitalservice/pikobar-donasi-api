@@ -41,6 +41,14 @@ class CreateRequest extends FormRequest
         $donateCategoryId = ConstantParser::searchById($this->request->get('donate_id'),
             Constants::DONATION_CATEGORIES);
 
+        //investor category
+        $investorCategoryId = ConstantParser::searchById($this->request->get('category_id'),
+            Constants::INVESTOR_CATEGORIES);
+
+        if ($investorCategoryId['slug'] === 'perusahaan') {
+            $rules['profile_picture'] = 'mimes:jpeg,jpg,png';
+        }
+
         if ($donateCategoryId['slug'] === 'logistik') {
             $rules['package_id'] = 'required';
             $rules['quantity'] = 'required|min:1|max:9999999999';
@@ -56,7 +64,7 @@ class CreateRequest extends FormRequest
             $rules['items.*.id'] = 'required';
             $rules['items.*.package_name'] = 'required';
             $rules['items.*.quantity'] = 'required|min:1|max:9999999999';
-            $rules['items.*.oum'] = 'required';
+            $rules['items.*.uom'] = 'required';
             $rules['files'] = 'required|mimes:docx,doc,pdf,jpeg,jpg,png';
         }
         return $rules;

@@ -22,7 +22,8 @@ class StatisticMapper extends BaseMapper implements MapperContract
             'personal_investor' => $item->personal_investor,
             'company_investor' => $item->company_investor,
             'total_goods' => $item->total_goods,
-            'total_cash' =>  (float)number_format($item->total_cash, 2, '.', '')
+            'total_cash' =>  (float)number_format($item->total_cash, 2, '.', ''),
+            'date_input' => $item->date_input,
         ];
     }
 

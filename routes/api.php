@@ -48,13 +48,16 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api',
     });
 
     Route::group(['as' => 'donate.', 'prefix' => 'donate'], function () {
+        Route::get('/', 'InvestorController@index');
         Route::get('/show/{id}', 'InvestorController@showInvestor');
         Route::post('/verification/{id}', 'InvestorController@verification');
     });
 
     Route::group(['as' => 'statistic.', 'prefix' => 'statistic'], function () {
         Route::get('/', 'StatistikController@index');
-        Route::post('/update', 'StatistikController@update');
+        Route::get('/show-last', 'StatistikController@showLastStatistic');
+        Route::post('/create', 'StatistikController@create');
+        Route::post('/update/{id}', 'StatistikController@update');
     });
 
     Route::group(['as' => 'sembako.', 'prefix' => 'sembako'], function () {

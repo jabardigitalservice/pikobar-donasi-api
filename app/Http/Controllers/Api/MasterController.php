@@ -73,6 +73,5 @@ class MasterController extends Controller
             Log::error($e->getMessage());
             return Mapper::error($e->getMessage(), $request->method());
         }
-
     }
 }

@@ -41,6 +41,17 @@ class ImageLibrary
         return $imageId;
     }
 
+    public function saveInvestorImg($image, $name)
+    {
+        $nameSlug = Str::slug($name);
+        $nameLimit =  Str::limit($nameSlug, 191, '');
+        $resize = $this->resize($image, 256, 256);
+        $ext = $image->getClientOriginalExtension();
+        $full = $this->rootDir . 'investor/profile' . '/' . $nameLimit . '.' . $ext;
+        Storage::disk()->put($full, $resize->encode());
+        return $full;
+    }
+
     public function delete(ImageModel $model)
     {
         Storage::disk()->delete($model->path);

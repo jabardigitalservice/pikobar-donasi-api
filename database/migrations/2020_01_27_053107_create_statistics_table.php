@@ -19,6 +19,9 @@ class CreateStatisticsTable extends Migration
             $table->bigInteger('company_investor')->default(0)->comment('Jumlah donatur percompany');
             $table->bigInteger('total_goods')->default(0)->comment('Jumlah barang yang terkumpul');
             $table->decimal('total_cash', 15, 2)->default(0)->comment('Jumlah dana tunai yang terkumpul');
+            $table->dateTime('date_input');
+            $table->string('last_key', 50)->nullable();
+            $table->tinyInteger('is_last')->default(0);
             $table->timestamps();
             $table->index('personal_investor');
             $table->index('company_investor');

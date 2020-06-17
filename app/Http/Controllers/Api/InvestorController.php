@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\NewInvestorAwardEvent;
 use App\Events\NewInvestorEvent;
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\Investor\CreateRequest;
 use App\Http\Requests\Investor\VerificationRequest;
 use App\Libraries\ConstantParser;
 use App\Libraries\FilesLibrary;
+use App\Libraries\ImageLibrary;
 use App\Mappers\Investor\InvestorMapper;
+use App\Mappers\Investor\ListInvestorSembako;
+use App\Mappers\Investor\ListInvestorTunai;
 use App\Mappers\Investor\SembakoDonateMap;
 use App\Models\Bank;
 use App\Models\Constants;
@@ -18,6 +22,7 @@ use App\Models\SembakoPackage;
 use App\Services\Mapper\Facades\Mapper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Webpatser\Uuid\Uuid;
 
@@ -28,6 +33,35 @@ use Webpatser\Uuid\Uuid;
  */
 class InvestorController extends ApiController
 {
+    public function index(Request $request)
+    {
+        try {
+            $limit = $request->has('limit') ? $request->input('limit') : 141;
+            $sort = $request->has('sort') ? $request->input('sort') : 'investors.date_input';
+            $order = $request->has('order') ? $request->input('order') : 'DESC';
+            $type = $request->has('type') ? $request->input('type') : 'tunai';
+            $conditions = '1 = 1';
+            //tipe donasi tunai,logistik,medis
+            $conditions .= " AND donate_category = '$type'";
+            if (config('app.env') === 'production') {
+                $conditions .= " AND donate_status = 'verified'";
+            }
+            $paged = Investor::select('*')
+                ->whereRaw($conditions)
+                ->orderBy($sort, $order)
+                ->paginate($limit);
+            $countAll = Investor::count();
+            if ($type === 'tunai') {
+                return Mapper::list(new ListInvestorTunai(), $paged, $countAll, $request->method());
+            } else if ($type === 'logistik') {
+                return Mapper::list(new ListInvestorSembako(), $paged, $countAll, $request->method());
+            }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
     /**
      * Get Investor detail, Only For Admin.
      * ini dipergunakan oleh admin untuk approval donatur,
@@ -50,18 +84,45 @@ class InvestorController extends ApiController
         }
     }
 
+    public function storeClaimAward($id, Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $item = Investor::find($id);
+            if (!$item) {
+                throw new \Exception("Invalid Investor Id");
+            }
+            if ($item->donate_status !== 'verified') {
+                throw new \Exception("Cannot send reward");
+            }
+            $item->award_claim = 1;
+            $item->update();
+            // Create an event
+            event(new NewInvestorAwardEvent($item));
+            // Commit to database
+            DB::commit();
+            return Mapper::single(new InvestorMapper(), $item, $request->method());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
     public function verification($id, VerificationRequest $request)
     {
         try {
             $donateStatus = ConstantParser::searchById($request->donate_status_id,
                 Constants::INVESTOR_STATUS);
             if ($donateStatus['slug'] === 'verified') {
-                throw new \Exception("Already Verified");
+                throw new \Exception("Data yang sudah Verified");
             }
             DB::beginTransaction();
             $item = Investor::find($id);
             if (!$item) {
                 throw new \Exception("Invalid Investor Id");
+            }
+            if ($item->donate_status === 'verified' && $donateStatus['slug'] !== 'rejected') {
+                throw new \Exception("Tidak bisa di Un Verified");
             }
             $item->donate_status = $donateStatus['slug'];
             $item->donate_status_name = $donateStatus['name'];
@@ -111,6 +172,17 @@ class InvestorController extends ApiController
             $data->donate_date = date('Y-m-d');
             $data->invoice_number = \App\Libraries\NumberLibrary::createInvoice();
             $dataRequest = null;
+            if ($investorCategoryId['slug'] === 'perusahaan') {
+                if ($request->hasFile('profile_picture')) {
+                    if ($request->file('profile_picture')->isValid()) {
+                        $imgLib = new ImageLibrary();
+                        $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
+                        $fullPath = $imgLib->saveInvestorImg($request->file('profile_picture'), $name);
+                        $data->profile_picture = $fullPath;
+                    }
+                }
+                $data->profile_picture = $fullPath;
+            }
             if ($donateCategoryId['slug'] === 'logistik') {
                 try {
                     if ($request->hasFile('files')) {
@@ -277,6 +349,7 @@ class InvestorController extends ApiController
                 if (array_key_exists('id', $item)
                     && array_key_exists('quantity', $item)
                     && array_key_exists('package_name', $item)
+                    && array_key_exists('uom', $item)
                 ) {
                     $uomId = ConstantParser::searchById($item['uom'],
                         Constants::UOM);
