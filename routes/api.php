@@ -4,6 +4,7 @@
 Route::post('/login', ['as' => 'api.login', 'uses' => 'ApiLoginController@login']);
 Route::post('/refresh-token', 'ApiLoginController@refresh');
 Route::delete('/logout', 'ApiLoginController@logout')->middleware('auth:api');
+Route::post('/forgot', 'Api\AuthController@forgot');
 
 Route::group(['as' => 'api::', 'namespace' => 'Api', 'prefix' => 'public/v1'], function () {
 
