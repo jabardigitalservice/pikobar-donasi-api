@@ -43,10 +43,6 @@ class StatistikController extends ApiController
     {
         \DB::beginTransaction();
         try {
-            //Statistic::where('is_last', '=', 1)->update(['is_last' => 0]);
-            /*\DB::table('statistics')
-                ->where('is_last', 1)
-                ->update(['is_last' => 0]);*/
             $item = new Statistic();
             if (Statistic::count() == 1) {
                 $item->last_key = Constants::DEFAULT_STATISTIC_ID;
