@@ -14,18 +14,28 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
+        'App\Console\Commands\SyncPosCommand',
+        'App\Console\Commands\SyncUpdatePosCommand'
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $unix_timestamp = now()->timestamp;
+        $schedule->command('syncpos:init')
+            ->dailyAt('00:01')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path("logs/syncpos-$unix_timestamp.log"));
+
+        $schedule->command('syncpos:update')
+            ->dailyAt('00:39')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path("logs/syncposupdate-$unix_timestamp.log"));
     }
 
     /**
@@ -35,7 +45,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

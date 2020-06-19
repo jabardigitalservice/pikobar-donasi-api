@@ -73,7 +73,7 @@ class LogisticController extends Controller
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
             CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_TIMEOUT => 300
+            CURLOPT_TIMEOUT => 800
         );
         UniRequest::curlOpts($curlOptions);
         UniRequest::jsonOpts(true, 512, JSON_UNESCAPED_SLASHES);
