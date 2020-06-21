@@ -122,7 +122,10 @@ class User extends Authenticatable
 
     public function findForPassport($identifier)
     {
-        return $this->orWhere('email', $identifier)->orWhere('username', $identifier)->first();
+        return $this
+            ->where('active', '=', 1)
+            ->where('email', $identifier)
+            ->first();
     }
 
     public function roleone()

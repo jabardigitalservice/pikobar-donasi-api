@@ -56,7 +56,6 @@ class LoginProxy
                 'password' => $password
             ]);
         }
-        //return abort(401);
     }
 
     /**
@@ -73,9 +72,9 @@ class LoginProxy
     public function proxy($grantType, array $data = [])
     {
         $data = array_merge($data, [
-            'client_id' => env('PASSWORD_CLIENT_ID', '2'),
-            'client_secret' => env('PASSWORD_CLIENT_SECRET', '6uK3T8N8af'),
-            'grant_type' => $grantType
+            'client_id' => config('covid19.password.client_id'),
+            'client_secret' => config('covid19.password.client_secret'),
+            'grant_type' => $grantType,
         ]);
         $curlOptions = array(
             CURLOPT_SSL_VERIFYHOST => 0,
