@@ -12,6 +12,10 @@ return [
     | any other location as required by the application or its packages.
     |
     */
+    'password' => [
+        'client_id' => env('PASSWORD_CLIENT_ID'),
+        'client_secret' => env('PASSWORD_CLIENT_SECRET'),
+    ],
     'document_path' => env('document_path', 'documents'),
     'oauth_client_url' => env('OAUTH_CLIENT_URL', '/oauth/token'),
     'api_key_logistic' => env('API_KEY_LOGISTIC', ''),
