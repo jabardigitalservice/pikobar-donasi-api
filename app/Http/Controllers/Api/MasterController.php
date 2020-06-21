@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Mappers\BankMapper;
 use App\Models\Bank;
 use App\Models\Constants;
@@ -10,7 +10,7 @@ use App\Services\Mapper\Facades\Mapper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class MasterController extends Controller
+class MasterController extends ApiController
 {
     public function getUom(Request $request)
     {

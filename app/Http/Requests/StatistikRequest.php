@@ -28,10 +28,10 @@ class StatistikRequest extends FormRequest
     public function rules()
     {
         return [
-            'personal_investor' => 'required|numeric|min:1',
-            'company_investor' => 'required|numeric|min:1',
-            'total_goods' => 'required|numeric|min:1',
-            'total_cash' => 'required|numeric|min:1'
+            'personal_investor' => 'required|numeric|min:0',
+            'company_investor' => 'required|numeric|min:0',
+            'total_goods' => 'required|numeric|min:0',
+            'total_cash' => 'required|numeric|min:0'
         ];
     }
 

@@ -59,8 +59,16 @@ class SembakoPackageMap extends BaseMapper implements MapperContract
     function list($items)
     {
         $result = [];
-        foreach ($items as $item) {
-            $result[] = $this->single($item);
+
+        foreach ($items as $id => $item) {
+            $result[$id]['id'] = $item->id;
+            $result[$id]['sku'] = $item->sku;
+            $result[$id]['package_name'] = $item->package_name;
+            $result[$id]['package_description'] = $item->package_description;
+            $result[$id]['status'] = $item->status;
+            $result[$id]['created_at'] = $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : null;
+            $result[$id]['updated_at'] = $item->updated_at ? $item->updated_at->format('Y-m-d H:i:s') : null;
+            //$result[$id]['items'] =  $item->items ? $item->items : [];
         }
         return $result;
     }

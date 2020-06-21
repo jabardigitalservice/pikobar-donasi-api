@@ -17,10 +17,9 @@ class SembakoDonateMap extends BaseMapper implements MapperContract
     {
         return [
             'id' => $item->id,
-            'investor_id' => $item->investor_id,
             'investor_name' => $item->investor_name,
-            'investor_phone' => $item->investor_phone,
-            'investor_email' => $item->investor_email,
+            'investor_phone' => $item->phone,
+            'investor_email' => $item->email,
             'created_at' => $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : null,
             'updated_at' => $item->updated_at ? $item->updated_at->format('Y-m-d H:i:s') : null
         ];

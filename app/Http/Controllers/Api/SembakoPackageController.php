@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Http\Requests\Sembako\CreateItemRequest;
 use App\Http\Requests\Sembako\CreateRequest;
 use App\Http\Requests\Sembako\UpdateItemRequest;
@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Webpatser\Uuid\Uuid;
 
-class SembakoPackageController extends Controller
+class SembakoPackageController extends ApiController
 {
     public function index(Request $request)
     {
@@ -44,6 +44,10 @@ class SembakoPackageController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function itemIndex(Request $request)
     {
         try {
@@ -64,6 +68,37 @@ class SembakoPackageController extends Controller
             return Mapper::list(new SembakoItemPackageMap(), $paged, $countAll, $request->method());
         } catch (\Exception $e) {
             Log::error($e->getMessage());
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
+    /**
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id, Request $request)
+    {
+        try {
+            $item = SembakoPackage::find($id);
+            if (!$item) {
+                throw new \Exception("Invalid sembako id");
+            }
+            return Mapper::single(new SembakoPackageMap(), $item, $request->method());
+        } catch (\Exception $e) {
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
+    public function showItem($id, Request $request)
+    {
+        try {
+            $item = SembakoPackageItem::find($id);
+            if (!$item) {
+                throw new \Exception("Invalid sembako item id");
+            }
+            return Mapper::single(new SembakoItemPackageMap(), $item, $request->method());
+        } catch (\Exception $e) {
             return Mapper::error($e->getMessage(), $request->method());
         }
     }
@@ -123,7 +158,7 @@ class SembakoPackageController extends Controller
                 'last_modified_by' => auth('api')->user()->id
             ]);
             \DB::commit();
-            return Mapper::single(new SembakoPackageMap(), $sembako, $request->method());
+            return Mapper::single(new SembakoItemPackageMap(), $sembako, $request->method());
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             \DB::rollBack();

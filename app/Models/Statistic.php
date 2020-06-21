@@ -56,4 +56,23 @@ class Statistic extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
+
+    /**
+     * @return mixed
+     */
+    public static function sql()
+    {
+        return self::select(
+            'statistics.id',
+            'statistics.personal_investor',
+            'statistics.company_investor',
+            'statistics.total_goods',
+            'statistics.total_cash',
+            'statistics.last_key',
+            'statistics.date_input',
+            'statistics.is_last',
+            'statistics.created_at',
+            'statistics.updated_at'
+        );
+    }
 }
