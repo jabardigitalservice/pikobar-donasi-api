@@ -22,7 +22,7 @@ class ListInvestorTunai extends BaseMapper implements MapperContract
             $result[$id]['email'] = $item->email;
             $result[$id]['donate_status_name'] = $item->donate_status_name;
             $result[$id]['category_name'] = $item->category_name;
-            $date    =     new \DateTime($item->donate_date);
+            $date = new \DateTime($item->donate_date);
             $result[$id]['donate_date'] = $date->format('d-m-Y');
             $result[$id]['attachment_id'] = $item->attachment_id ? asset($item->files->getFileUrlAttribute()) : '';
             $result[$id]['profile_picture'] = $item->profile_picture ? asset($item->getProfilePictureAttribute()) : '';

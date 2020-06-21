@@ -7,9 +7,8 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StatistikRequest extends FormRequest
+class ResetPasswordRequest extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -28,10 +27,7 @@ class StatistikRequest extends FormRequest
     public function rules()
     {
         return [
-            'personal_investor' => 'required|numeric|min:0',
-            'company_investor' => 'required|numeric|min:0',
-            'total_goods' => 'required|numeric|min:0',
-            'total_cash' => 'required|numeric|min:0'
+            'email' => 'email|required',
         ];
     }
 

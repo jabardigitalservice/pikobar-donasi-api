@@ -32,7 +32,6 @@ class ListInvestorSembako extends BaseMapper implements MapperContract
                 foreach ($item->items as $idx => $itemData) {
                     $qty += $itemData->quantity;
                     $result[$id]['item_package_name'] = $itemData->item_package_name;
-                    $result[$id]['item_package_name'] = $itemData->item_package_name;
                     $result[$id]['quantity'] = $qty;
                 }
             }

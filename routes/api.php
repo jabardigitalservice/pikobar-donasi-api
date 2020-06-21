@@ -1,9 +1,10 @@
 <?php
 
-// Login, Logout, Refresh Token
+// Login, Logout, Forgot, Refresh Token
 Route::post('/login', ['as' => 'api.login', 'uses' => 'ApiLoginController@login']);
 Route::post('/refresh-token', 'ApiLoginController@refresh');
 Route::delete('/logout', 'ApiLoginController@logout')->middleware('auth:api');
+Route::post('/forgot', 'Api\AuthController@forgot');
 
 Route::group(['as' => 'api::', 'namespace' => 'Api', 'prefix' => 'public/v1'], function () {
 
@@ -56,13 +57,16 @@ Route::group(['as' => 'api::', 'namespace' => 'Api', 'middleware' => 'auth:api',
     Route::group(['as' => 'statistic.', 'prefix' => 'statistic'], function () {
         Route::get('/', 'StatistikController@index');
         Route::get('/show-last', 'StatistikController@showLastStatistic');
-        Route::post('/create', 'StatistikController@create');
+        Route::post('/create', 'StatistikController@store');
         Route::post('/update/{id}', 'StatistikController@update');
     });
 
     Route::group(['as' => 'sembako.', 'prefix' => 'sembako'], function () {
         Route::get('/', 'SembakoPackageController@index');
         Route::get('/items', 'SembakoPackageController@itemIndex');
+
+        Route::get('/show/{id}', 'SembakoPackageController@show');
+        Route::get('/show-item/{id}', 'SembakoPackageController@showItem');
 
         Route::post('/create', 'SembakoPackageController@store');
         Route::post('/update/{id}', 'SembakoPackageController@update');

@@ -29,7 +29,7 @@ class StatistikController extends ApiController
             $limit = $request->has('limit') ? $request->input('limit') : 50;
             $sort = $request->has('sort') ? $request->input('sort') : 'statistics.created_at';
             $order = $request->has('order') ? $request->input('order') : 'DESC';
-            $paged = Statistic::select('*')
+            $paged = Statistic::sql()
                 ->orderBy($sort, $order)
                 ->paginate($limit);
             $countAll = Statistic::count();
@@ -39,18 +39,29 @@ class StatistikController extends ApiController
         }
     }
 
-    public function create(StatistikRequest $request)
+    /**
+     * Buat statistik baru pertanggal.
+     *
+     * @param StatistikRequest $request
+     * @return \Illuminate\Http\Response
+     * @throws \Exception
+     */
+    public function store(StatistikRequest $request)
     {
         \DB::beginTransaction();
+
         try {
-            //Statistic::where('is_last', '=', 1)->update(['is_last' => 0]);
-            /*\DB::table('statistics')
-                ->where('is_last', 1)
-                ->update(['is_last' => 0]);*/
-            $item = new Statistic();
+            $model = new Statistic();
             if (Statistic::count() == 1) {
-                $item->last_key = Constants::DEFAULT_STATISTIC_ID;
+                $model->last_key = Constants::DEFAULT_STATISTIC_ID;
                 $lastData = Statistic::find(Constants::DEFAULT_STATISTIC_ID)->first();
+                if ($lastData->personal_investor === 0
+                    && $lastData->personal_investor === 0
+                    && $lastData->company_investor === 0
+                    && $lastData->total_goods === 0
+                    && $lastData->total_cash === "0.00") {
+                    throw new \Exception("data default harus di update terlebih dahulu.");
+                }
                 if ($request->personal_investor < $lastData->personal_investor) {
                     throw new \Exception("data personal harus >= dari sebelumnya");
                 } else if ($request->company_investor < $lastData->company_investor) {
@@ -58,11 +69,11 @@ class StatistikController extends ApiController
                 } else if ($request->total_goods < $lastData->total_goods) {
                     throw new \Exception("data barang harus >= dari sebelumnya");
                 } else if ($request->total_cash < $lastData->total_cash) {
-                    throw new \Exception("data cash harus >= dari sebelumnya" );
+                    throw new \Exception("data cash harus >= dari sebelumnya");
                 }
             } else {
                 $lastData = Statistic::where('is_last', '=', 1)->first();
-                $item->last_key = $lastData->id;
+                $model->last_key = $lastData->id;
                 if ($request->personal_investor < $lastData->personal_investor) {
                     throw new \Exception("data personal harus >= dari sebelumnya");
                 } else if ($request->company_investor < $lastData->company_investor) {
@@ -70,27 +81,27 @@ class StatistikController extends ApiController
                 } else if ($request->total_goods < $lastData->total_goods) {
                     throw new \Exception("data barang harus >= dari sebelumnya");
                 } else if ($request->total_cash < $lastData->total_cash) {
-                    throw new \Exception("data cash harus >= dari sebelumnya" );
+                    throw new \Exception("data cash harus >= dari sebelumnya");
                 }
             }
-            $item->id = (string)Uuid::generate(4)->string;
-            $item->personal_investor = $request->personal_investor;
-            $item->company_investor = $request->company_investor;
-            $item->total_goods = $request->total_goods;
+            $model->id = (string)Uuid::generate(4)->string;
+            $model->personal_investor = $request->personal_investor;
+            $model->company_investor = $request->company_investor;
+            $model->total_goods = $request->total_goods;
             $cash = number_format($request->total_cash, 2, '.', '');
-            $item->total_cash = $cash;
-            $item->date_input = now();
-            $item->is_last = 1;
+            $model->total_cash = $cash;
+            $model->date_input = now();
+            $model->is_last = 1;
 
             // Update
-            \DB::table('statistics')
-                ->where('is_last', 1)
+            Statistic::where('is_last', 1)
                 ->update(['is_last' => 0]);
             // Save
-            $item->save();
-
+            $model->save();
+            // Commit To DB
             \DB::commit();
-            return Mapper::single(new StatisticMapper(), $item, $request->method());
+            //Return Success
+            return Mapper::single(new StatisticMapper(), $model, $request->method());
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             \DB::rollBack();
@@ -120,6 +131,14 @@ class StatistikController extends ApiController
         }
     }
 
+    /**
+     * Update statistik.
+     *
+     * @param $id
+     * @param StatistikRequest $request
+     * @return \Illuminate\Http\Response
+     * @throws \Exception
+     */
     public function update($id, StatistikRequest $request)
     {
         \DB::beginTransaction();
@@ -136,7 +155,9 @@ class StatistikController extends ApiController
             $item->total_cash = $cash;
             // Update
             $item->update();
+            // Commit To DB
             \DB::commit();
+            // Return Success
             return Mapper::single(new StatisticMapper(), $item, $request->method());
         } catch (\Exception $e) {
             Log::error($e->getMessage());

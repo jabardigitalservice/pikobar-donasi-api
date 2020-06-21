@@ -37,12 +37,13 @@ class InvestorController extends ApiController
     {
         try {
             $limit = $request->has('limit') ? $request->input('limit') : 141;
-            $sort = $request->has('sort') ? $request->input('sort') : 'investors.date_input';
+            $sort = $request->has('sort') ? $request->input('sort') : 'investors.donate_date';
             $order = $request->has('order') ? $request->input('order') : 'DESC';
             $type = $request->has('type') ? $request->input('type') : 'tunai';
             $conditions = '1 = 1';
             //tipe donasi tunai,logistik,medis
             $conditions .= " AND donate_category = '$type'";
+            //jika production
             if (config('app.env') === 'production') {
                 $conditions .= " AND donate_status = 'verified'";
             }
@@ -110,25 +111,25 @@ class InvestorController extends ApiController
 
     public function verification($id, VerificationRequest $request)
     {
+        DB::beginTransaction();
         try {
             $donateStatus = ConstantParser::searchById($request->donate_status_id,
                 Constants::INVESTOR_STATUS);
-            if ($donateStatus['slug'] === 'verified') {
-                throw new \Exception("Data yang sudah Verified");
-            }
-            DB::beginTransaction();
             $item = Investor::find($id);
             if (!$item) {
+                DB::rollBack();
                 throw new \Exception("Invalid Investor Id");
             }
+            // jika status sudah verifikasi dan mau di unverified...
             if ($item->donate_status === 'verified' && $donateStatus['slug'] !== 'rejected') {
+                DB::rollBack();
                 throw new \Exception("Tidak bisa di Un Verified");
             }
             $item->donate_status = $donateStatus['slug'];
             $item->donate_status_name = $donateStatus['name'];
             $item->update();
-            //@TODO COPY VALUE KE WAREHOUSE (KARENA TABLE INI TIDAK UNTUK READ)
-            // Commit to database
+            // Create an event
+            event(new NewInvestorAwardEvent($item));
             DB::commit();
             return Mapper::single(new InvestorMapper(), $item, $request->method());
         } catch (\Exception $e) {
@@ -190,17 +191,12 @@ class InvestorController extends ApiController
                             $fileLib = new FilesLibrary();
                             $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
                             $dataId = $fileLib->saveDocument($request->file('files'), $name);
-                            $tempExtra = [];
-                            $tempExtra['id'] = Uuid::generate(4)->string;
-                            $tempExtra['created_at'] = date('Y-m-d');
-                            $tempExtra['updated_at'] = date('Y-m-d');
-                            $imageData[$dataId] = $tempExtra;
                         }
                     }
                     $data->attachment_id = $dataId;
                     $data->save();
 
-
+                    //save sembako
                     $this->storeSembako($request, $data->id);
                     // Commit to database
                     DB::commit();
@@ -219,11 +215,6 @@ class InvestorController extends ApiController
                             $fileLib = new FilesLibrary();
                             $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
                             $dataId = $fileLib->saveTransferSlip($request->file('files'), $name);
-                            $tempExtra = [];
-                            $tempExtra['id'] = Uuid::generate(4)->string;
-                            $tempExtra['created_at'] = date('Y-m-d');
-                            $tempExtra['updated_at'] = date('Y-m-d');
-                            $imageData[$dataId] = $tempExtra;
                         }
                     }
                     $data->attachment_id = $dataId;
@@ -247,11 +238,6 @@ class InvestorController extends ApiController
                             $fileLib = new FilesLibrary();
                             $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
                             $dataId = $fileLib->saveDocument($request->file('files'), $name);
-                            $tempExtra = [];
-                            $tempExtra['id'] = Uuid::generate(4)->string;
-                            $tempExtra['created_at'] = date('Y-m-d');
-                            $tempExtra['updated_at'] = date('Y-m-d');
-                            $imageData[$dataId] = $tempExtra;
                         }
                     }
                     $data->attachment_id = $dataId;
