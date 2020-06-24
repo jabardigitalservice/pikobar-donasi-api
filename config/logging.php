@@ -99,6 +99,21 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'database' => [
+            'driver' => 'custom',
+            'via' => danielme85\LaravelLogToDB\LogToDbHandler::class,
+            'level' => env('APP_LOG_LEVEL', 'debug'),
+            //'name' => 'My DB Log',
+            'connection' => 'default',
+            'collection' => 'log',
+            'detailed' => true,
+            'queue' => false,
+            'queue_name' => '',
+            'queue_connection' => '',
+            'max_records' => false,
+            'max_hours' => false,
+        ],
     ],
 
 ];

@@ -37,9 +37,10 @@ class SembakoPackageController extends ApiController
                 ->orderBy($sort, $order)
                 ->paginate($limit);
             $countAll = SembakoPackage::count();
+            Log::debug("DATA");
             return Mapper::list(new SembakoPackageMap(), $paged, $countAll, $request->method());
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
+            Log::error(self::class . " : " . $e->getMessage());
             return Mapper::error($e->getMessage(), $request->method());
         }
     }

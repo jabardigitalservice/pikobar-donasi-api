@@ -12,6 +12,7 @@ return [
     | any other location as required by the application or its packages.
     |
     */
+    'DEFAULT_SIDEBAR_ID' => '386a3745-3c13-58c4-f6ac-c1962cabc9db',
     'password' => [
         'client_id' => env('PASSWORD_CLIENT_ID'),
         'client_secret' => env('PASSWORD_CLIENT_SECRET'),

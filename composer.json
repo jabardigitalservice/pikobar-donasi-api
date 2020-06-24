@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "danielme85/laravel-log-to-db": "^2.3",
         "fideloper/proxy": "^4.0",
         "flynsarmy/csv-seeder": "1.0.*",
         "intervention/image": "^2.5",
@@ -45,6 +46,9 @@
         "classmap": [
             "database/seeds",
             "database/factories"
+        ],
+        "files": [
+            "app/Helpers/AppHelpers.php"
         ]
     },
     "autoload-dev": {
