@@ -10,16 +10,20 @@ class Authenticate extends Middleware
     /**
      * Get the path the user should be redirected to when they are not authenticated.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return string|null
      */
     protected function redirectTo($request)
     {
-        $errors = array();
-        $errors['meta']['code'] = 401;
-        $errors['meta']['message'] = trans('message.api.error');
-        $errors['meta']['errors'] = array('You must login');
-        $errors['data'] = [];
-        return new JsonResponse($errors, 401);
+        if (!$request->ajax() || !$request->expectsJson()) {
+            return route('login');
+        } else {
+            $errors = array();
+            $errors['meta']['code'] = 401;
+            $errors['meta']['message'] = trans('message.api.error');
+            $errors['meta']['errors'] = array('You must login');
+            $errors['data'] = [];
+            return new JsonResponse($errors, 401);
+        }
     }
 }

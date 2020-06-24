@@ -1,0 +1,240 @@
+sup.fa-asterisk {
+    font-size: 8px;
+}
+
+fieldset legend {
+    font-size: 16px;
+}
+
+/*User Avatar*/
+.navbar-nav > .user-menu .user-image {
+    width: 25px !important;
+    height: 25px !important;
+}
+
+.navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+    position: absolute;
+    right: 0;
+    left: auto;
+    width: 200px !important;
+}
+
+.user-panel > .image > img {
+    width: 100% !important;
+    max-width: 85px !important;
+    height: auto !important;
+}
+
+.profile-user-img {
+    width: 150px;
+    height: 150px;
+}
+
+.profile-user-img-wrapper {
+    margin: 0 auto;
+    height: 150px;
+    width: 150px;
+}
+
+.profile-user-img-wrapper .change-avatar,
+.profile-user-img-wrapper .change-avatar .icon,
+.profile-user-img-wrapper .change-avatar .text {
+    display: none;
+    position: absolute;
+    margin: 0 auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #fff;
+    text-align: center;
+}
+
+.profile-user-img-wrapper:hover .change-avatar,
+.profile-user-img-wrapper:hover .change-avatar .icon,
+.profile-user-img-wrapper:hover .change-avatar .text {
+    display: block;
+}
+
+.change-avatar {
+    background-color: #333;
+    top: 10px;
+    height: 150px;
+    width: 150px;
+    opacity: .5;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.change-avatar .icon {
+    top: 30%;
+    font-size: 40px;
+}
+
+.change-avatar .icon:before {
+    font-family: 'Glyphicons Halflings';
+    content: "\e046";
+}
+
+.change-avatar .text {
+    top: 60%;
+    font-size: 18px;
+}
+
+/*Form*/
+.login-box-body, .register-box-body {
+    border-radius: 5px;
+}
+
+.login-box-msg, .register-box-msg, .forgot-password-box-msg, .reset-password-box-msg {
+    margin: 0;
+    text-align: center;
+    padding: 0 20px 20px 20px;
+}
+
+.box-footer {
+    text-align: center;
+}
+
+.box-footer .btn {
+    min-width: 100px;
+    margin-left: 2.5px;
+    margin-right: 2.5px;
+}
+
+.form-group.has-error .select2 .select2-selection {
+    border-color: #dd4b39;
+    box-shadow: none;
+}
+
+/*Table*/
+.table .center {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table .action .btn {
+    margin-left: 2.5px;
+    margin-right: 2.5px;
+}
+
+/*Sidebar*/
+.sidebar-menu li.active > a > .fa-angle-left,
+.sidebar-menu li.active > a > .pull-right-container > .fa-angle-left {
+    -webkit-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+}
+
+.sidebar-menu li.active > a > .fa-folder:before,
+.sidebar-menu li.active > a > .pull-right-container > .fa-folder:before {
+    content: "\f07c";
+}
+
+/* FIXED DATA-TABLE */
+.table {
+    margin: 0 auto;
+    width: 100%;
+    clear: both;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.table td {
+    word-wrap: break-word;
+    max-width: 400px;
+}
+
+.pace {
+    -webkit-pointer-events: none;
+    pointer-events: none;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.pace-inactive {
+    display: none;
+}
+
+.pace .pace-progress {
+    background: #ff0000;
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    right: 100%;
+    width: 100%;
+    height: 2px;
+}
+
+/*Modal*/
+@media (min-width: 768px) {
+    .modal-dialog {
+        width: 750px;
+        margin: 30px auto;
+    }
+}
+@media (min-width: 992px) {
+    .modal-dialog {
+        width: 970px;
+        margin: 30px auto;
+    }
+}
+@media (min-width: 1200px) {
+    .modal-dialog {
+        width: 1170px;
+        margin: 30px auto;
+    }
+}
+.modal .modal-content,
+.modal .modal-header {
+    border-radius: 5px;
+}
+.modal .modal-header {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.modal .modal-header .close {
+    margin-top: 0;
+    opacity: 1;
+}
+.modal .modal-header .close:hover {
+    opacity: .5;
+}
+.modal .box-body {
+    padding: 0;
+}
+.modal .box-footer {
+    padding-bottom: 0;
+}
+.modal-primary {
+    color: #fff;
+    background-color: #3c8dbc;
+    border-color: #367fa9;
+}
+.modal-primary .close { color: #fff; }
+.modal-success {
+    color: #fff;
+    background-color: #00a65a;
+    border-color: #008d4c;
+}
+.modal-success .close { color: #fff; }
+.modal-info {
+    color: #fff;
+    background-color: #00c0ef;
+    border-color: #00acd6;
+}
+.modal-info .close { color: #fff; }
+.modal-warning {
+    color: #fff;
+    background-color: #f39c12;
+    border-color: #e08e0b;
+}
+.modal-warning .close { color: #fff; }
+.modal-danger {
+    color: #fff;
+    background-color: #dd4b39;
+    border-color: #d73925;
+}
+.modal-danger .close { color: #fff; }

@@ -1,0 +1,123 @@
+.nav-tabs-custom {
+    background: none !important;
+}
+
+textarea {
+    resize: none;
+    border-radius: 3px !important;
+}
+
+.nav-tabs-custom > .tab-content {
+    background: none !important;
+}
+
+.nav-tabs-custom > .nav-tabs > li.active > a, .nav-tabs-custom > .nav-tabs > li.active:hover > a {
+    background-color: transparent !important;
+}
+
+.nav-tabs-custom > .nav-tabs > li.active > a {
+    border-right-color: transparent !important;
+    border-left-color: transparent !important;
+}
+
+.nav-tabs-custom > .nav-tabs {
+    border-bottom-color: inherit !important;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #767A80;
+}
+
+.content-wrapper {
+    background: #F8F8F8;
+}
+
+.box {
+    border: none;
+    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
+}
+
+.box-header {
+    padding: 14px 10px;
+}
+
+.box-header h3 {
+    color: #73D0FF;
+}
+
+.box-body {
+    border-top: 1px solid #EAF1F6;
+}
+
+.box-body.stripped {
+    background: #f7fcff;
+}
+
+.box-body .text-label {
+    font-weight: 600;
+    color: #707070;
+    font-size: 12px;
+}
+
+.box-body .text-desc {
+    color: #707070;
+    font-size: 12px;
+}
+
+.box-body .text-desc p {
+    margin-bottom: 0;
+}
+
+.funding {
+    /*background-color: #76e4ff !important;*/
+    background: #44c1e1; /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #6dd5ed, #44c1e1); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #6dd5ed, #44c1e1); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.funding h3 {
+    color: #fff;
+}
+
+.funding .icon {
+    top: 0px;
+    right: 15px;
+    font-size: 55px;
+    color: #32abc8;
+}
+
+.funding:hover .icon {
+    font-size: 65px;
+}
+
+.box-inner {
+    padding: 15px;
+}
+
+.edited-user-desc {
+
+}
+
+.edited-user-desc .form-group {
+    margin-bottom: 0;
+}
+
+.edited-user-desc h4 {
+    margin-top: 0;
+}
+
+.edited-user-desc textarea {
+    resize: none;
+    /*border-radius: 3px;*/
+    margin-bottom: 10px;
+}
+
+.edited-user-desc input {
+    border-radius: 3px;
+}

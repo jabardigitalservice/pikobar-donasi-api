@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(BanksSeeder::class);
         $this->call(StatisticSeeder::class);
         $this->call(MaterialSeeder::class);
+        $this->call(MenuSeeder::class);
     }
 }

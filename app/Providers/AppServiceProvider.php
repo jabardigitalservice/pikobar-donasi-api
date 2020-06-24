@@ -26,10 +26,16 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         Schema::defaultStringLength(191);
-
         // Ide for developer
         if ($this->app->environment() !== 'production') {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        }
+        if (!$this->app->runningInConsole()) {
+            $themes = 'default';
+            view()->share('app_site_title', config('app.name'));
+            view()->share('app_site_theme', $themes);
+            $viewThemes = 'frontend.themes.' . $themes;
+            view()->share('view_themes', $viewThemes);
         }
     }
 }
