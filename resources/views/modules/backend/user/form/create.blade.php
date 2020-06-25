@@ -47,15 +47,15 @@
 
                         <div class="col-md-9">
 
-                            <div class="form-group{!! $errors->has('nick_name') ? ' has-error' : '' !!}">
-                                <label for="nick_name" class="col-sm-2 control-label">Nick Name</label>
+                            <div class="form-group{!! $errors->has('username') ? ' has-error' : '' !!}">
+                                <label for="username" class="col-sm-2 control-label">Username</label>
                                 <div class="col-sm-10">
-                                    <input name="nick_name" id="nick_name"
+                                    <input name="username" id="username"
                                            value=""
                                            class="form-control">
-                                    @if ($errors->has('nick_name'))
+                                    @if ($errors->has('username'))
                                         <span class="help-block">
-                                            <strong>{!! $errors->first('nick_name') !!}</strong>
+                                            <strong>{!! $errors->first('username') !!}</strong>
                                         </span>
                                     @endif
                                 </div>
@@ -146,12 +146,17 @@
                                 <label for="role" class="col-sm-2 control-label">Role</label>
                                 <div class="col-sm-10">
                                     <select class="select-remote form-control"
-                                            id="role"
-                                            name="role">
+                                            id="roles"
+                                            name="roles">
                                         @foreach($roles as $role)
                                             <option value="{{$role->id}}">{{$role->role_name}}</option>
                                         @endforeach
                                     </select>
+                                    @if ($errors->has('roles'))
+                                        <span class="help-block">
+                                            <strong>{!! $errors->first('roles') !!}</strong>
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                             <!-- /."form-group -->

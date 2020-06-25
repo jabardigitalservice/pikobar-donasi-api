@@ -23,7 +23,7 @@
                     <thead>
                     <tr>
                         <th style="visibility: hidden">Id</th>
-                        <th>Nick Name</th>
+                        <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
                         <th>Action</th>
@@ -63,7 +63,7 @@
                         visible: false,
                         className: 'center'
                     },
-                    {data: 'nick_name'},
+                    {data: 'username'},
                     {data: 'email'},
                     {data: 'role_name'},
                     {data: 'action', orderable: false, searchable: false, width: '15%', className: 'center action'}

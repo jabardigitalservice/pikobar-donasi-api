@@ -33,7 +33,7 @@
                             <li class="user-header">
                                 <img id="dropdown-avatar" width="256px" height="256px"
                                      class="profile-user-img img-responsive img-circle"
-                                        {!! auth()->user()->avatar ? ' src="'.asset(Storage::url(auth()->user()->image->image_url)).'"'
+                                        {!! auth()->user()->avatar ? ' src="'.asset(auth()->user()->image->image_url).'"'
                                         : ' data-src="holder.js/128x128?text=128x128"' !!}>
                                 <p>
                                     <small>{{ auth()->user()->nick_name }}</small>
@@ -41,7 +41,7 @@
                             </li>
                             <li class="user-footer">
                                 <div class="pull-left">
-                                    <a href="javascript:;"
+                                    <a href="{{ route('backend::users.edit', auth()->user()->id) }}"
                                        class="btn btn-default btn-flat"><i class="fa fa-user">&nbsp;Profile</i></a>
                                 </div>
                                 <div class="pull-right">

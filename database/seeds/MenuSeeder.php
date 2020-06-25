@@ -47,6 +47,18 @@ class MenuSeeder extends Seeder
             'is_default' => 1,
         ])->id;
 
+        \App\Models\Menu::create([
+            'id' => (string)Uuid::generate(4),
+            'parent_id' => $adminDefault,
+            'menu_title' => 'User management',
+            'slug' => 'sidebar-users',
+            'url' => 'users',
+            'icon' => 'fa fa-user',
+            'menu_order' => 2,
+            'is_active' => 1,
+            'is_default' => 1,
+        ])->id;
+
         $menus = \App\Models\Menu::select()
             ->whereNotNull('slug')
             ->get();

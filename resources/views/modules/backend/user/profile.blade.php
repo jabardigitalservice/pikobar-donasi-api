@@ -52,7 +52,7 @@
                                                            value="{!! $data->image->id !!}"/>
                                                     <img id="preview-avatar-profile" width="128px" height="128px"
                                                          class="profile-user-img img-responsive img-circle"
-                                                            {!! $data->avatar ? ' src="'.asset(Storage::url($data->image->image_url)).'"'
+                                                            {!! $data->avatar ? ' src="'.asset(($data->image->image_url)).'"'
                                                             : ' data-src="holder.js/128x128?text=128x128"' !!}/>
                                                     <p class="text-muted text-center" style="margin-top:5px"><a
                                                                 id="a-remove-profile-img" href="javascript:;">Remove
@@ -80,6 +80,23 @@
                                     <!-- /.col -->
 
                                     <div class="col-md-9">
+
+                                        <div class="form-group{!! $errors->has('username') ? ' has-error' : '' !!}">
+                                            <label for="nick_name" class="col-sm-2 control-label">Username</label>
+                                            <div class="col-sm-10">
+                                                @php $nickname = isset($data) ? ($data->username) : ""; @endphp
+                                                <input name="username" id="username"
+                                                       value="{{ old('username') ? old('username') : $nickname }}"
+                                                       class="form-control" readonly>
+                                                @if ($errors->has('username'))
+                                                    <span class="help-block">
+                                            <strong>{!! $errors->first('username') !!}</strong>
+                                        </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <!-- /."form-group -->
+
                                         <div class="form-group{!! $errors->has('first_name') ? ' has-error' : '' !!}">
                                             <label for="first_name" class="col-sm-2 control-label">First Name</label>
                                             <div class="col-sm-10">
@@ -112,21 +129,7 @@
                                         </div>
                                         <!-- /."form-group -->
 
-                                        <div class="form-group{!! $errors->has('nick_name') ? ' has-error' : '' !!}">
-                                            <label for="nick_name" class="col-sm-2 control-label">Nick Name</label>
-                                            <div class="col-sm-10">
-                                                @php $nickname = isset($data) ? ($data->nick_name) : ""; @endphp
-                                                <input name="nick_name" id="nick_name"
-                                                       value="{{ old('nick_name') ? old('nick_name') : $nickname }}"
-                                                       class="form-control" readonly>
-                                                @if ($errors->has('nick_name'))
-                                                    <span class="help-block">
-                                            <strong>{!! $errors->first('nick_name') !!}</strong>
-                                        </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <!-- /."form-group -->
+
 
                                         <div class="form-group{!! $errors->has('email') ? ' has-error' : '' !!}">
                                             <label for="email" class="col-sm-2 control-label">Email</label>
@@ -173,12 +176,12 @@
                                             $loggedUser = auth()->user()->roles()->pluck('roles.slug')->toArray();
                                         @endphp
                                         @if($loggedUser[0] === 'owner' || $loggedUser[0] === 'administrator')
-                                            <div class="form-group{!! $errors->has('role') ? ' has-error' : '' !!}">
-                                                <label for="role" class="col-sm-2 control-label">Role</label>
+                                            <div class="form-group{!! $errors->has('roles') ? ' has-error' : '' !!}">
+                                                <label for="roles" class="col-sm-2 control-label">Role</label>
                                                 <div class="col-sm-10">
                                                     <select class="select-remote form-control"
-                                                            id="role"
-                                                            name="role">
+                                                            id="roles"
+                                                            name="roles">
                                                         @foreach($roles as $role)
                                                             <option {{in_array($role->id, $listSelectedRole ?: []) ? "selected": ""}} value="{{$role->id}}">{{$role->role_name}}</option>
                                                         @endforeach
@@ -187,7 +190,7 @@
                                             </div>
                                             <!-- /."form-group -->
                                         @else
-                                            <div class="form-group{!! $errors->has('role') ? ' has-error' : '' !!}">
+                                            <div class="form-group{!! $errors->has('roles') ? ' has-error' : '' !!}">
                                                 <label for="roleFake" class="col-sm-2 control-label">Role</label>
                                                 <div class="col-sm-10">
                                                     <select disabled="" class="select-remote form-control"

@@ -50,4 +50,16 @@ Route::group(['as' => 'backend::', 'namespace' => 'Backend', 'middleware' => 'au
         Route::get('showCreateRoot/{id}', ['as' => 'showCreateRoot', 'uses' => 'SidebarController@showCreateRoot']);
         Route::post('store', ['as' => 'store', 'uses' => 'SidebarController@store']);
     });
+
+    // # USER
+    Route::group(['as' => 'users.', 'prefix' => 'users'], function () {
+        Route::get('/', ['as' => 'index', 'uses' => 'UserController@index']);
+        Route::get('create', ['as' => 'showCreate', 'uses' => 'UserController@showCreate']);
+        Route::get('datatables', ['as' => 'datatables', 'uses' => 'UserController@getDatatable']);
+        // Transaction
+        Route::post('/store', ['as' => 'store', 'uses' => 'UserController@store']);
+        Route::get('/edit/{id}', ['as' => 'edit', 'uses' => 'UserController@showEdit']);
+        Route::post('/remove-media/{id}', ['as' => 'remove.media', 'uses' => 'UserController@removeMedia']);
+        Route::post('/password-update', ['as' => 'password', 'uses' => 'UserController@updatePassword']);
+    });
 });
