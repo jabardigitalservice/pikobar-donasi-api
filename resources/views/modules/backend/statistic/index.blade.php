@@ -5,18 +5,18 @@
 @endpush
 
 @section('title')
-    List Users
+    Statistik Donasi
 @endsection
 
 @section('content')
     <section class="content-header">
-        <h1>Users</h1>
+        <h1>Donasi</h1>
         {!! $breadcrumb !!}
     </section>
     <section class="content">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <a href="{!! route('backend::users.showCreate') !!}" class="btn btn-primary" title="">Add new</a>
+                <a href="{!! route('backend::users.showCreate') !!}" class="btn btn-success" title="">Tambah data donasi</a>
             </div>
             <div class="box-body">
                 <table class="table table-striped table-bordered table-datatables" width="100%">
