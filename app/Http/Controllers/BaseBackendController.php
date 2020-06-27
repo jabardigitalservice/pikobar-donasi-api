@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Session;
 
 /**
  * Class BaseBackendController.
@@ -36,6 +37,12 @@ abstract class BaseBackendController extends BaseController
 
     protected $menu = null;
 
+    protected $accessToken = null;
+
+    protected $refreshToken = null;
+
+    protected $baseUrl = null;
+
     public function __construct()
     {
         $this->routes = [
@@ -50,6 +57,16 @@ abstract class BaseBackendController extends BaseController
             'frontend' => 'frontend.',
             'backend' => 'modules.backend.',
         ];
+
+        // Base Url
+        $this->baseUrl = config('app.url');
+
+        //Inject accesstoken
+        $this->middleware(function ($request, $next) {
+            $this->accessToken = Session::get('access_token');
+            $this->refreshToken = Session::get('refresh_token');
+            return $next($request);
+        });
     }
 
     protected function breadcrumbs($children = null)

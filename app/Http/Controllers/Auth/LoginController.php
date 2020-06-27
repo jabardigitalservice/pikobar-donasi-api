@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Libraries\LoginProxy;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -29,13 +30,16 @@ class LoginController extends Controller
      */
     protected $redirectTo = RouteServiceProvider::HOME;
 
+    private $loginProxy;
+
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(LoginProxy $loginProxy)
     {
+        $this->loginProxy = $loginProxy;
         $this->middleware('guest')->except('logout');
     }
 
@@ -69,18 +73,21 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    /**
-     * [OVERRIDE].
-     *
-     * Attempt to log the user into the application.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return bool
-     */
     protected function attemptLogin(Request $request)
     {
-        return $this->guard()->attempt(
+        $valid = $this->guard()->attempt(
             $this->credentials($request), $request->filled('remember')
         );
+        if ($valid) {
+            $email = $request->input('email');
+            $password = $request->input('password');
+            $data = $this->loginProxy->attemptLogin($email, $password);
+            $request->session()->put([
+                'access_token' => $data['access_token'],
+                'refresh_token' => $data['refresh_token'],
+            ]);
+            return true;
+        }
+        return false;
     }
 }

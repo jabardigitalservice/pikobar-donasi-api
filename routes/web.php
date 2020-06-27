@@ -62,4 +62,11 @@ Route::group(['as' => 'backend::', 'namespace' => 'Backend', 'middleware' => 'au
         Route::post('/remove-media/{id}', ['as' => 'remove.media', 'uses' => 'UserController@removeMedia']);
         Route::post('/password-update', ['as' => 'password', 'uses' => 'UserController@updatePassword']);
     });
+
+    // #STATISTIK
+    Route::group(['as' => 'statistics.', 'prefix' => 'statistics'], function () {
+        Route::get('/', ['as' => 'index', 'uses' => 'StatistikController@index']);
+        Route::get('create', ['as' => 'showCreate', 'uses' => 'UserController@showCreate']);
+        Route::get('datatables', ['as' => 'datatables', 'uses' => 'StatistikController@getDatatable']);
+    });
 });
