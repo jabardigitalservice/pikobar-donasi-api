@@ -63,11 +63,11 @@ class StatistikController extends ApiController
                     throw new \Exception("data default harus di update terlebih dahulu.");
                 }
                 if ($request->personal_investor < $lastData->personal_investor) {
-                    throw new \Exception("data personal harus >= dari sebelumnya");
+                    throw new \Exception("data donatur perorangan harus >= dari sebelumnya");
                 } else if ($request->company_investor < $lastData->company_investor) {
-                    throw new \Exception("data company harus >= dari sebelumnya");
+                    throw new \Exception("data donatur perusahaan harus >= dari sebelumnya");
                 } else if ($request->total_goods < $lastData->total_goods) {
-                    throw new \Exception("data barang harus >= dari sebelumnya");
+                    throw new \Exception("data barang terkumpul harus >= dari sebelumnya");
                 } else if ($request->total_cash < $lastData->total_cash) {
                     throw new \Exception("data cash harus >= dari sebelumnya");
                 }
@@ -75,11 +75,11 @@ class StatistikController extends ApiController
                 $lastData = Statistic::where('is_last', '=', 1)->first();
                 $model->last_key = $lastData->id;
                 if ($request->personal_investor < $lastData->personal_investor) {
-                    throw new \Exception("data personal harus >= dari sebelumnya");
+                    throw new \Exception("data donatur perorangan harus >= dari sebelumnya");
                 } else if ($request->company_investor < $lastData->company_investor) {
-                    throw new \Exception("data company harus >= dari sebelumnya");
+                    throw new \Exception("data donatur perusahaan harus >= dari sebelumnya");
                 } else if ($request->total_goods < $lastData->total_goods) {
-                    throw new \Exception("data barang harus >= dari sebelumnya");
+                    throw new \Exception("data barang terkumpul harus >= dari sebelumnya");
                 } else if ($request->total_cash < $lastData->total_cash) {
                     throw new \Exception("data cash harus >= dari sebelumnya");
                 }
@@ -105,6 +105,51 @@ class StatistikController extends ApiController
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             \DB::rollBack();
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
+    /**
+     * Get Investor detail, Only For Admin.
+     * ini dipergunakan oleh admin untuk approval donatur,
+     * yang nantinya akan ditransfer ke table warehouse (quantity langsung dihitung berdasarkan item).
+     *
+     * @param $id
+     * @param Request $request
+     * @return mixed
+     */
+    public function showCount(Request $request)
+    {
+        try {
+            $item = Statistic::find(Constants::DEFAULT_STATISTIC_ID)->first();
+            $isDefault = false;
+            if ($item->personal_investor === 0
+                && $item->personal_investor === 0
+                && $item->company_investor === 0
+                && $item->total_goods === 0
+                && $item->total_cash === "0.00") {
+                $isDefault = true;
+            }
+            $countAll = Statistic::count();
+            $item = [
+                'count' => $countAll,
+                'default' => $isDefault
+            ];
+            return Mapper::object($item, $request->method());
+        } catch (\Exception $e) {
+            return Mapper::error($e->getMessage(), $request->method());
+        }
+    }
+
+    public function show($id, Request $request)
+    {
+        try {
+            $item = Statistic::find($id);
+            if (!$item) {
+                throw new \Exception("Invalid Statistic Id");
+            }
+            return Mapper::single(new StatisticMapper(), $item, $request->method());
+        } catch (\Exception $e) {
             return Mapper::error($e->getMessage(), $request->method());
         }
     }

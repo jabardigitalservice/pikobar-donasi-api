@@ -66,7 +66,12 @@ Route::group(['as' => 'backend::', 'namespace' => 'Backend', 'middleware' => 'au
     // #STATISTIK
     Route::group(['as' => 'statistics.', 'prefix' => 'statistics'], function () {
         Route::get('/', ['as' => 'index', 'uses' => 'StatistikController@index']);
-        Route::get('create', ['as' => 'showCreate', 'uses' => 'UserController@showCreate']);
+        Route::get('create', ['as' => 'showCreate', 'uses' => 'StatistikController@showCreate']);
+        Route::get('/show/{id}', ['as' => 'showUpdate', 'uses' => 'StatistikController@showUpdate']);
         Route::get('datatables', ['as' => 'datatables', 'uses' => 'StatistikController@getDatatable']);
+
+        // Transaction
+        Route::post('/store', ['as' => 'store', 'uses' => 'StatistikController@store']);
+        Route::post('/update/{id}', ['as' => 'update', 'uses' => 'StatistikController@update']);
     });
 });

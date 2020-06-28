@@ -50,6 +50,12 @@ class Statistic extends Model
         'is_last',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d h:i:s',
+        'updated_at' => 'datetime:Y-m-d h:i:s',
+        'date_input' => 'datetime:Y-m-d'
+    ];
+
     /**
      * The attributes that should be mutated to dates.
      *

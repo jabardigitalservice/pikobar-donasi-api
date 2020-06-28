@@ -6,6 +6,7 @@ namespace App\Mappers;
 use App\Libraries\NumberLibrary;
 use App\Services\Mapper\BaseMapper;
 use App\Services\Mapper\MapperContract;
+use Carbon\Carbon;
 
 class StatisticMapper extends BaseMapper implements MapperContract
 {
@@ -23,7 +24,8 @@ class StatisticMapper extends BaseMapper implements MapperContract
             'company_investor' => $item->company_investor,
             'total_goods' => $item->total_goods,
             'total_cash' =>  (float)number_format($item->total_cash, 2, '.', ''),
-            'date_input' => $item->date_input,
+            //'date_input' => $item->date_input,
+            'date_input' => Carbon::parse($item->date_input)->format('d-m-Y'),
         ];
     }
 

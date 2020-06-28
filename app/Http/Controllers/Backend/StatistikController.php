@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\BaseBackendController;
+use App\Libraries\PostmanLibrary as PostLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Unirest\Request as UniRequest;
 
 class StatistikController extends BaseBackendController
 {
@@ -24,8 +24,12 @@ class StatistikController extends BaseBackendController
     public function index()
     {
         try {
+            $api = $this->baseUrl . "/api/v1/statistic/count";
+            $response = PostLib::getJson($api, $this->accessToken);
+            $count = $response->body['data']['item']['count'];
+            $default = $response->body['data']['item']['default'];
             $breadcrumb = $this->breadcrumbs($this->breadcrumb . '<li class="active">' . 'List Statistik' . '</li>');
-            return view($this->view . '.index', compact('breadcrumb'));
+            return view($this->view . '.index', compact('breadcrumb', 'count', 'default'));
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             abort(500);
@@ -42,35 +46,16 @@ class StatistikController extends BaseBackendController
         $columnIndex = $request->input('order')[0]['column'];
         $columnName = $request->input('columns')[$columnIndex]['data'];
         $columnSortOrder = $request->input('order')[0]['dir'];
-        $searchValue = $request->input('search')['value'];
-
-        $headers = array('Authorization' => 'Bearer ' . $this->accessToken, 'Content-Type' => 'application/json');
-        $api = $this->baseUrl . "/api/v1/statistic?limit=$limit&page=$page";
-        $curlOptions = array(
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_SSLVERSION => 6,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_TIMEOUT => 60
-        );
-        UniRequest::curlOpts($curlOptions);
-        UniRequest::jsonOpts(true, 512, JSON_UNESCAPED_SLASHES);
-        UniRequest::verifyPeer(false); // Disables SSL cert validation
+        $sortBy = "order=$columnSortOrder&sort=$columnName";
+        $api = $this->baseUrl . "/api/v1/statistic?limit=$limit&page=$page&$sortBy";
         try {
-            $response = UniRequest::get($api, $headers, null);
+            $response = PostLib::getJson($api, $this->accessToken);
             $totalRecords = $response->body['page_info']['total'];
             $totalRecordsFiltered = $response->body['page_info']['count'];
             $dataRecords = $response->body['data']['items'];
-            //dd($dataRecords);
             $items = array();
             $num = 1;
             foreach ($dataRecords as $idx => $row) {
-                /*if ($row['status'] == true) {
-                    $row['status'] = 1;
-                    $checked = 'checked';
-                } else {
-                    $row['status'] = 0;
-                    $checked = '';
-                }*/
                 $action = null;
                 $status = null;
                 $items[] = array(
@@ -80,8 +65,7 @@ class StatistikController extends BaseBackendController
                     "company_investor" => $row['company_investor'],
                     "total_goods" => $row['total_goods'],
                     "total_cash" => $row['total_cash'],
-                    "date_input" => $row['date_input'],
-                    "action" => $action,
+                    "date_input" => $row['date_input']
                 );
                 $num++;
             }
@@ -91,12 +75,94 @@ class StatistikController extends BaseBackendController
                 "recordsFiltered" => (int)$totalRecords,
                 "data" => $items
             );
-
             return response()->json($outputResponse);
         } catch (\Exception $e) {
-            //dd($e->getMessage());
             Log::error($e->getMessage());
+            abort(500);
         }
-        //return response()->json(['error'], 500);
+    }
+
+    public function showUpdate($id, Request $request)
+    {
+        try {
+            $api = $this->baseUrl . "/api/v1/statistic/show/$id";
+            $response = PostLib::getJson($api, $this->accessToken);
+            $data = $response->body['data']['item'];
+            $breadcrumb = $this->breadcrumbs($this->breadcrumb . '<li class="active">' . 'List Statistik' . '</li>');
+            return view($this->view . '.form.update', compact('breadcrumb', 'data'));
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            abort(500);
+        }
+    }
+
+    public function showCreate()
+    {
+        try {
+            $api = $this->baseUrl . "/api/v1/statistic/show-last";
+            $response = PostLib::getJson($api, $this->accessToken);
+            $data = $response->body['data']['item'];
+            $breadcrumb = $this->breadcrumbs($this->breadcrumb . '<li class="active">' . 'Tambah data donasi' . '</li>');
+            return view($this->view . '.form.create', compact('breadcrumb', 'data'));
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            abort(500);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $data = array(
+                'personal_investor' => $request->input('personal_investor'),
+                'company_investor' => $request->input('company_investor'),
+                'total_goods' => $request->input('total_goods'),
+                'total_cash' => $request->input('total_cash'),
+            );
+            $api = $this->baseUrl . "/api/v1/statistic/create";
+            $response = PostLib::postJson($api, $this->accessToken, $data);
+            if ($response->code == 200) {
+                return redirect()->route('backend::statistics.index')->with('success', "Sukses ubah data");
+            } else {
+                return redirect()
+                    ->back()
+                    ->withErrors($response->body['errors'][0])
+                    ->withInput();
+            }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()
+                ->back()
+                ->withErrors($e->getMessage())
+                ->withInput();
+        }
+    }
+
+    public function update($id, Request $request)
+    {
+        try {
+            $data = array(
+                'personal_investor' => $request->input('personal_investor'),
+                'company_investor' => $request->input('company_investor'),
+                'total_goods' => $request->input('total_goods'),
+                'total_cash' => $request->input('total_cash'),
+            );
+            $api = $this->baseUrl . "/api/v1/statistic/update/$id";
+            $response = PostLib::postJson($api, $this->accessToken, $data);
+            if ($response->code == 200) {
+                return redirect()->route('backend::statistics.index')->with('success', "Sukses ubah data");
+            } else {
+                return redirect()
+                    ->back()
+                    ->withErrors($response->body['errors'][0])
+                    ->withInput();
+            }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()
+                ->back()
+                ->withErrors($e->getMessage())
+                ->withInput();
+        }
     }
 }

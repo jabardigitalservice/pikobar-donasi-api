@@ -17,10 +17,8 @@ class Handler extends ExceptionHandler
     protected $dontReport = [
         \Illuminate\Auth\AuthenticationException::class,
         \Illuminate\Auth\Access\AuthorizationException::class,
-        \Symfony\Component\HttpKernel\Exception\HttpException::class,
         \Illuminate\Database\Eloquent\ModelNotFoundException::class,
         \Illuminate\Session\TokenMismatchException::class,
-        \Illuminate\Validation\ValidationException::class,
         \League\OAuth2\Server\Exception\OAuthServerException::class,
     ];
 
@@ -89,10 +87,8 @@ class Handler extends ExceptionHandler
                 return response()->json($response, 400);
             }
             return parent::render($request, $exception);
-
-        } else {
-            return parent::render($request, $exception);
         }
+        return parent::render($request, $exception);
     }
 
     /**

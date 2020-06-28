@@ -14,21 +14,37 @@
         {!! $breadcrumb !!}
     </section>
     <section class="content">
+        @if(session()->has('failed'))
+            <div class="alert alert-danger">
+                {{ session()->get('failed') }}
+            </div>
+        @elseif(session()->has('success'))
+            <div class="alert alert-success alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                {{ session()->get('success') }}
+            </div>
+        @endif
         <div class="box box-primary">
             <div class="box-header with-border">
-                <a href="{!! route('backend::users.showCreate') !!}" class="btn btn-success" title="">Tambah data donasi</a>
+                @if($count === 1 && $default)
+                    <a href="{{route('backend::statistics.showUpdate', \App\Models\Constants::DEFAULT_STATISTIC_ID)}}"
+                       class="btn btn-success">Update data default</a>
+                @else
+                    <a href="{{route('backend::statistics.showCreate')}}"
+                       class="btn btn-success">Tambah data donasi</a>
+                @endif
             </div>
             <div class="box-body">
-                <table class="table table-striped table-bordered table-datatables" width="100%">
+                <table id="table-statistics" class="table table-striped table-bordered table-datatables" width="100%">
                     <thead>
                     <tr>
+                        <th>No</th>
                         <th style="visibility: hidden">Id</th>
                         <th>Tgl Pembaruan</th>
                         <th>Donatur Perorangan</th>
                         <th>Donatur Perusahaan</th>
                         <th>Barang Terkumpul</th>
                         <th>Donasi Tunai Terkumpul</th>
-                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -46,7 +62,7 @@
     <script src="{{ asset('plugins/datatables/js/buttons.bootstrap.min.js') }}"></script>
     <script>
         $(function () {
-            $('.table-datatables').DataTable({
+            $('#table-statistics').DataTable({
                 processing: true,
                 serverSide: true,
                 lengthChange: true,
@@ -59,33 +75,56 @@
                 ajax: '{!! route($route.".datatables") !!}',
                 columns: [
                     {
+                        data: 'no',
+                        name: 'no',
+                        width: '5%',
+                        visible: true,
+                        className: 'center'
+                    },
+                    {
                         data: 'id',
                         name: 'id',
                         width: '5%',
                         visible: false,
                         className: 'center'
                     },
-                    {data: 'date_input'},
-                    {data: 'personal_investor'},
-                    {data: 'company_investor'},
-                    {data: 'total_goods'},
-                    {data: 'total_cash'},
-                    {data: 'action', orderable: false, searchable: false, width: '15%', className: 'center action'}
+                    {
+                        data: 'date_input'
+                    },
+                    {
+                        data: 'personal_investor',
+                        className: 'center'
+                    },
+                    {
+                        data: 'company_investor',
+                        className: 'center'
+                    },
+                    {
+                        data: 'total_goods',
+                        className: 'center'
+                    },
+                    {
+                        data: 'total_cash',
+                        render: $.fn.dataTable.render.number('.', ',', 2),
+                        className: 'left'
+                    }
                 ],
-                order: [[0, "asc"]],
+                order: [[2, "desc"]],
                 columnDefs: [
                     {targets: 0, sortable: false, orderable: false},
-                    {targets: 1, sortable: true, orderable: true},
-                    {targets: 2, sortable: false, orderable: false},
-                    {targets: 3, sortable: false, orderable: false},
-                    {targets: 4, sortable: false, orderable: false},
-                    {targets: 5, sortable: false, orderable: false},
+                    {targets: 1, sortable: false, orderable: false},
+                    {targets: 2, sortable: true, orderable: true},
+                    {targets: 3, sortable: true, orderable: true},
+                    {targets: 4, sortable: true, orderable: true},
+                    {targets: 5, sortable: true, orderable: true},
+                    {targets: 6, sortable: true, orderable: true},
                 ],
                 drawCallback: function () {
                     INIT.tooltip();
                     INIT.run();
                 },
             });
+            $('#table-statistics_filter').hide();
         });
     </script>
 @endpush
