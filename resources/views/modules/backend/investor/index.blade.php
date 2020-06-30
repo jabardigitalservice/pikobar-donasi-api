@@ -42,7 +42,7 @@
             </div>
 
             <div class="box-body">
-                <table class="table table-striped table-bordered table-datatables" width="100%">
+                <table id="table-investor" class="table table-striped table-bordered table-datatables" width="100%">
                     <thead>
                     <tr>
                         <th style="visibility: hidden">No</th>
@@ -74,7 +74,7 @@
     <script src="{{ asset('plugins/datatables/js/buttons.bootstrap.min.js') }}"></script>
     <script>
         $(function () {
-            var table = $('.table-datatables').DataTable({
+            var table = $('#table-investor').DataTable({
                 processing: true,
                 serverSide: true,
                 lengthChange: true,
@@ -135,6 +135,8 @@
                     INIT.run();
                 },
             });
+
+            $('#table-investor_filter').hide();
 
             $('#buttonFilter').on('click', function () {
                 var donaturType = $('#donatur_type').val();
