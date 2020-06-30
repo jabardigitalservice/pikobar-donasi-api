@@ -74,4 +74,11 @@ Route::group(['as' => 'backend::', 'namespace' => 'Backend', 'middleware' => 'au
         Route::post('/store', ['as' => 'store', 'uses' => 'StatistikController@store']);
         Route::post('/update/{id}', ['as' => 'update', 'uses' => 'StatistikController@update']);
     });
+
+    // #STATISTIK
+    Route::group(['as' => 'investors.', 'prefix' => 'investors'], function () {
+        Route::get('/', ['as' => 'index', 'uses' => 'InvestorController@index']);
+        Route::get('datatables', ['as' => 'datatables', 'uses' => 'InvestorController@getDatatable']);
+        Route::get('/show/{id}', ['as' => 'showDetail', 'uses' => 'InvestorController@showDetail']);
+    });
 });

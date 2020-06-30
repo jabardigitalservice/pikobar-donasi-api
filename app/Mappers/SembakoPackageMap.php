@@ -36,7 +36,7 @@ class SembakoPackageMap extends BaseMapper implements MapperContract
      */
     function create($item)
     {
-        // TODO: Implement create() method.
+
     }
 
     /**
@@ -47,7 +47,7 @@ class SembakoPackageMap extends BaseMapper implements MapperContract
      */
     function edit($item)
     {
-        // TODO: Implement edit() method.
+
     }
 
     /**

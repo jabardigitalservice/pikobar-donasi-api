@@ -67,15 +67,6 @@ class Investor extends Model
         'deleted_by',
     ];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array
-     */
-    protected $appends = [
-        'profile_picture'
-    ];
-
     public function items()
     {
         return $this->hasMany('App\Models\InvestorItem', 'investor_id', 'id');
@@ -84,15 +75,5 @@ class Investor extends Model
     public function files()
     {
         return $this->belongsTo(Files::class, 'attachment_id', 'id');
-    }
-
-    /**
-     * Get the image's full url.
-     *
-     * @return string
-     */
-    public function getProfilePictureAttribute()
-    {
-        return \Storage::url($this->attributes['profile_picture']);
     }
 }

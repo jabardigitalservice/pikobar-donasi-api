@@ -44,7 +44,7 @@ class InvestorMapper extends BaseMapper implements MapperContract
      */
     function create($item)
     {
-        // TODO: Implement create() method.
+
     }
 
     /**
@@ -55,7 +55,7 @@ class InvestorMapper extends BaseMapper implements MapperContract
      */
     function edit($item)
     {
-        // TODO: Implement edit() method.
+
     }
 
     function list($items)

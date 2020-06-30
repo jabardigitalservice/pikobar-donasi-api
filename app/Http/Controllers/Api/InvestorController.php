@@ -36,16 +36,20 @@ class InvestorController extends ApiController
     public function index(Request $request)
     {
         try {
-            $limit = $request->has('limit') ? $request->input('limit') : 141;
-            $sort = $request->has('sort') ? $request->input('sort') : 'investors.donate_date';
-            $order = $request->has('order') ? $request->input('order') : 'DESC';
-            $type = $request->has('type') ? $request->input('type') : 'tunai';
+            $limit = $request->has('limit') ? $request->input('limit') : 100;
+            $sort = $request->has('sort') && $request->input('sort') !== null ? $request->input('sort') : 'investors.donate_date';
+            $order = $request->has('order') && $request->input('order') !== null ? $request->input('order') : 'DESC';
+            $type = $request->has('type') && $request->input('type') !== null ? $request->input('type') : 'tunai';
+            $donateStatus = $request->has('donate_status') && $request->input('donate_status') !== null ? $request->input('donate_status') : '';
+            $investorName = $request->has('investor_name') && $request->input('investor_name') !== null ? $request->input('investor_name') : '';
             $conditions = '1 = 1';
             //tipe donasi tunai,logistik,medis
             $conditions .= " AND donate_category = '$type'";
-            //jika production
-            if (config('app.env') === 'production') {
-                $conditions .= " AND donate_status = 'verified'";
+            if ($donateStatus) {
+                $conditions .= " AND donate_status = '$donateStatus'";
+            }
+            if ($investorName) {
+                $conditions .= " AND investor_name LIKE '%" . strtolower(trim($investorName)) . "%'";
             }
             $paged = Investor::select('*')
                 ->whereRaw($conditions)
@@ -182,7 +186,6 @@ class InvestorController extends ApiController
                         $data->profile_picture = $fullPath;
                     }
                 }
-                $data->profile_picture = $fullPath;
             }
             if ($donateCategoryId['slug'] === 'logistik') {
                 try {
@@ -191,9 +194,9 @@ class InvestorController extends ApiController
                             $fileLib = new FilesLibrary();
                             $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
                             $dataId = $fileLib->saveDocument($request->file('files'), $name);
+                            $data->attachment_id = $dataId;
                         }
                     }
-                    $data->attachment_id = $dataId;
                     $data->save();
 
                     //save sembako
@@ -215,9 +218,9 @@ class InvestorController extends ApiController
                             $fileLib = new FilesLibrary();
                             $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
                             $dataId = $fileLib->saveTransferSlip($request->file('files'), $name);
+                            $data->attachment_id = $dataId;
                         }
                     }
-                    $data->attachment_id = $dataId;
                     $data->save();
 
                     $this->storeTunai($request, $data->id);
@@ -238,9 +241,9 @@ class InvestorController extends ApiController
                             $fileLib = new FilesLibrary();
                             $name = $investor_name . '-' . Str::random(5) . '-' . date('Y-m-d H:i:s');
                             $dataId = $fileLib->saveDocument($request->file('files'), $name);
+                            $data->attachment_id = $dataId;
                         }
                     }
-                    $data->attachment_id = $dataId;
                     $data->save();
 
                     $this->storeMedis($request, $data->id);
@@ -254,6 +257,7 @@ class InvestorController extends ApiController
                     return Mapper::error($e->getMessage(), $request->method());
                 }
             }
+            //return response()->json(['messages'=> 'oke']);
             return Mapper::single(new SembakoDonateMap(), $data, $request->method());
         } catch (\Exception $e) {
             DB::rollBack();

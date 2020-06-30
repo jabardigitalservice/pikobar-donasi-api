@@ -16,7 +16,7 @@ class AuthMapper extends BaseMapper implements MapperContract
      */
     function list($items)
     {
-        // TODO: Implement list() method.
+
     }
 
     /**
@@ -27,7 +27,7 @@ class AuthMapper extends BaseMapper implements MapperContract
      */
     function single($item)
     {
-        // TODO: Implement single() method.
+
     }
 
     /**
@@ -38,7 +38,7 @@ class AuthMapper extends BaseMapper implements MapperContract
      */
     function create($item)
     {
-        // TODO: Implement create() method.
+
     }
 
     /**
@@ -49,6 +49,6 @@ class AuthMapper extends BaseMapper implements MapperContract
      */
     function edit($item)
     {
-        // TODO: Implement edit() method.
+
     }
 }
