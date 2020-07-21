@@ -75,10 +75,35 @@ Route::group(['as' => 'backend::', 'namespace' => 'Backend', 'middleware' => 'au
         Route::post('/update/{id}', ['as' => 'update', 'uses' => 'StatistikController@update']);
     });
 
-    // #STATISTIK
+    // #INVESTORS
     Route::group(['as' => 'investors.', 'prefix' => 'investors'], function () {
         Route::get('/', ['as' => 'index', 'uses' => 'InvestorController@index']);
         Route::get('datatables', ['as' => 'datatables', 'uses' => 'InvestorController@getDatatable']);
         Route::get('/show/{id}', ['as' => 'showDetail', 'uses' => 'InvestorController@showDetail']);
+    });
+
+    // #SEMBAKO PACKAGE
+    Route::group(['as' => 'sembako-packages.', 'prefix' => 'sembako-packages'], function () {
+        Route::get('/', ['as' => 'index', 'uses' => 'SembakoPackageController@index']);
+        Route::get('datatables', ['as' => 'datatables', 'uses' => 'SembakoPackageController@getDatatable']);
+        Route::get('create', ['as' => 'showCreate', 'uses' => 'SembakoPackageController@showCreate']);
+        Route::get('/show/{id}', ['as' => 'showDetail', 'uses' => 'SembakoPackageController@showDetail']);
+        Route::get('/edit/{id}', ['as' => 'showDetail', 'uses' => 'SembakoPackageController@showEdit']);
+        Route::post('/update/{id}', ['as' => 'update', 'uses' => 'SembakoPackageController@update']);
+        Route::post('/store', ['as' => 'store', 'uses' => 'SembakoPackageController@store']);
+        Route::post('delete/{id}', ['as' => 'delete', 'uses' => 'SembakoPackageController@delete']);
+
+    });
+
+    // #SEMBAKO PACKAGE ITEMS
+    Route::group(['as' => 'sembako-items.', 'prefix' => 'sembako-items'], function () {
+        Route::get('/', ['as' => 'index', 'uses' => 'SembakoItemController@index']);
+        Route::get('datatables', ['as' => 'datatables', 'uses' => 'SembakoItemController@getDatatable']);
+        Route::get('create', ['as' => 'showCreate', 'uses' => 'SembakoItemController@showCreate']);
+        Route::get('/show/{id}', ['as' => 'showDetail', 'uses' => 'SembakoItemController@showDetail']);
+        Route::get('/edit/{id}', ['as' => 'showDetail', 'uses' => 'SembakoItemController@showEdit']);
+        Route::post('/update/{id}', ['as' => 'update', 'uses' => 'SembakoItemController@update']);
+        Route::post('/store', ['as' => 'store', 'uses' => 'SembakoItemController@store']);
+        Route::post('delete/{id}', ['as' => 'delete', 'uses' => 'SembakoItemController@delete']);
     });
 });
